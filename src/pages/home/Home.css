@@ -15,12 +15,13 @@ body {
   font-family: sans-serif;
 }
 
-.home-container,
-.panels-container {
+/* body 전체에 걸린 overflow: hidden을 삭제하거나 .home-active 같은 클래스로 제어하세요 */
+/* 대신 .home-container에만 스크롤을 막습니다 */
+.home-container {
   width: 100vw;
   height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* 홈에서만 작동 */
 }
 
 /* ⭐️ 새로 추가된 대지(땅) 스타일 */
@@ -34,15 +35,24 @@ body {
   z-index: 0; /* 배경보단 앞, 오리보단 뒤에 위치! */
 }
 
+/* ⭐️ 1. 오리는 무조건 1층 바닥에 고정시킵니다 */
 .duck-container {
-  z-index: 1 !important; /* 오리는 땅 위(0)에 서 있습니다 */
+  position: absolute; /* 혹은 fixed (기존 Duck.css 세팅에 따름) */
+  z-index: 1 !important;
 }
 
+/* ⭐️ 2. 글씨와 패널들을 담는 통을 100층으로 강제 격상시킵니다 */
 .panels-container {
-  z-index: 10;
-  pointer-events: none;
+  position: absolute; /* relative 대신 absolute로 화면을 완전히 덮어버립니다 */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100 !important; /* 오리가 절대 못 뚫고 오게 숫자를 확 높였습니다 */
+  pointer-events: none; /* 투명 망토 처리 */
 }
 
+/* ⭐️ 3. 패널 안의 내용물들은 다시 만질 수 있게 살려둡니다 */
 .panel {
   position: absolute;
   top: 0;
@@ -54,5 +64,16 @@ body {
   justify-content: center;
   align-items: center;
   background-color: transparent;
-  pointer-events: auto;
+  pointer-events: auto; /* 버튼, 카드 등을 클릭할 수 있게 살려둠 */
+}
+
+/* ⭐️ 4. 땅(Ground)도 오리 아래(0층)에 잘 깔려 있게 확인 */
+.ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 25vh;
+  background-color: #e0e0e0;
+  z-index: 0 !important;
 }
