@@ -37,7 +37,6 @@ export default function Home() {
         // 🎥 2단계: 땅 위를 걸어서 오른쪽으로 이동!
         .to('.project-panel', { xPercent: -100 }, 'step2')
         .to('.contact-panel', { xPercent: 0 }, 'step2')
-        .to('.duck-container', { x: '35vw' }, 'step2') // ⭐️ 착지한 높이 그대로 우측으로 스윽 걸어갑니다!
         .addLabel('step2');
 
       const goToSection = (newIndex) => {
