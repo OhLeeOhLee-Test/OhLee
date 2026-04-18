@@ -1,0 +1,46 @@
+/* ⭐️ App.css에서 버렸던 필수 뼈대를 Home.css가 흡수합니다! */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  overflow: hidden; 
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  color: #111;
+  font-family: sans-serif;
+}
+
+/* 기존 Home.css 내용 시작 */
+.home-container, .panels-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.panels-container {
+  z-index: 10;
+  pointer-events: none; 
+}
+
+.duck-container {
+  z-index: 1 !important; 
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent; 
+  pointer-events: auto; 
+}
