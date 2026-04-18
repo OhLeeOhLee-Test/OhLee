@@ -14,45 +14,44 @@ export default function Home() {
       let currentIndex = 0;
       let isAnimating = false;
 
-      // ⭐️ 1. 텍스트 겹침 방지! 프로젝트 화면은 아래에, 컨택은 오른쪽에 숨깁니다.
+      document.body.setAttribute('data-section', currentIndex);
+
+      // ⭐️ 1. 초기 세팅: 프로젝트, 컨택, 그리고 '땅'을 화면 밖에 숨깁니다.
       gsap.set('.project-panel', { yPercent: 100 });
       gsap.set('.contact-panel', { xPercent: 100 });
+      gsap.set('.ground', { yPercent: 100 }); // 땅은 바닥 아래에 대기!
 
       const tl = gsap.timeline({
         paused: true,
         defaults: { duration: 1, ease: 'power2.inOut' },
       });
 
+      // 🎥 1단계: 줌아웃 & 땅 등장
       tl.addLabel('step0')
         .to('.home-panel', { yPercent: -100 }, 'step1')
         .to('.project-panel', { yPercent: 0 }, 'step1')
-
-        // ⭐️ 오리 동선 수정: 크기를 줄이고 왼쪽(-40vw) 아래(35vh)로 이동!
-        .to('.duck-container', { scale: 0.4, x: '-40vw', y: '35vh' }, 'step1')
-
+        .to('.ground', { yPercent: 0 }, 'step1') // ⭐️ 땅이 밑에서 스르륵 올라옵니다!
+        .to('.duck-container', { scale: 0.4, x: '-35vw', y: '15vh' }, 'step1') // ⭐️ 오리가 작아지며 왼쪽 땅 위에 착지!
         .addLabel('step1')
+
+        // 🎥 2단계: 땅 위를 걸어서 오른쪽으로 이동!
         .to('.project-panel', { xPercent: -100 }, 'step2')
-
-        // ⭐️ 2번(컨택) 화면으로 갈 때 오리 코드는 뺐습니다. (왼쪽 아래에 그대로 고정!)
         .to('.contact-panel', { xPercent: 0 }, 'step2')
-
+        .to('.duck-container', { x: '35vw' }, 'step2') // ⭐️ 착지한 높이 그대로 우측으로 스윽 걸어갑니다!
         .addLabel('step2');
 
       const goToSection = (newIndex) => {
         isAnimating = true;
         currentIndex = newIndex;
-
-        // ⭐️ 3. 오리에게 텔레파시(Event) 보내기
+        document.body.setAttribute('data-section', currentIndex);
         window.dispatchEvent(
           new CustomEvent('sectionChange', { detail: currentIndex })
         );
-
         tl.tweenTo(`step${currentIndex}`, {
           onComplete: () => (isAnimating = false),
         });
       };
 
-      // 휠 이벤트 감지기 (방향 정상화 완료)
       Observer.create({
         target: window,
         type: 'wheel,touch',
@@ -72,6 +71,10 @@ export default function Home() {
   return (
     <div className="home-container" ref={homeRef}>
       <Duck />
+
+      {/* ⭐️ 배경에 깔릴 새로운 대지(땅)입니다 */}
+      <div className="ground"></div>
+
       <div className="panels-container">
         <section className="panel home-panel">
           <h1>Engineering Lab</h1>

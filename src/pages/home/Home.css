@@ -1,34 +1,46 @@
-/* ⭐️ App.css에서 버렸던 필수 뼈대를 Home.css가 흡수합니다! */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
-  overflow: hidden; 
+html,
+body {
+  overflow: hidden;
   width: 100vw;
   height: 100vh;
-  background-color: white;
+  /* 1번 화면은 하늘색이나 하얀색 등 원하는 하늘 배경을 상상하시면 됩니다 */
+  background-color: #f8f9fa;
   color: #111;
   font-family: sans-serif;
 }
 
-/* 기존 Home.css 내용 시작 */
-.home-container, .panels-container {
+.home-container,
+.panels-container {
   width: 100vw;
   height: 100vh;
   position: relative;
   overflow: hidden;
 }
 
-.panels-container {
-  z-index: 10;
-  pointer-events: none; 
+/* ⭐️ 새로 추가된 대지(땅) 스타일 */
+.ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 25vh; /* 화면 밑에서 25%만큼 차지합니다 */
+  background-color: #e0e0e0; /* 임시로 깔아둔 밝은 회색 땅 (나중에 이미지나 다른 색으로 변경 가능) */
+  z-index: 0; /* 배경보단 앞, 오리보단 뒤에 위치! */
 }
 
 .duck-container {
-  z-index: 1 !important; 
+  z-index: 1 !important; /* 오리는 땅 위(0)에 서 있습니다 */
+}
+
+.panels-container {
+  z-index: 10;
+  pointer-events: none;
 }
 
 .panel {
@@ -41,6 +53,6 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: transparent; 
-  pointer-events: auto; 
+  background-color: transparent;
+  pointer-events: auto;
 }
