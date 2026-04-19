@@ -4,7 +4,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #111;
+  background-color: #111; 
   color: white;
   display: flex;
   justify-content: center;
@@ -48,13 +48,14 @@
   background-color: #eee;
 }
 
+/* ⭐️ 안내문 스타일 */
+.loading-notice {
+  margin-top: 30px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }

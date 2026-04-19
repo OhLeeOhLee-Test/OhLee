@@ -12,16 +12,15 @@ export default function Duck() {
   const currentSectionRef = useRef(0);
   const targetFrameRef = useRef(4);
 
+  // ⭐️ 1. 순수하게 소리와 점프만 남은 꽥 함수
   const playQuack = () => {
-    // 1. 소리 재생
     const audio = new Audio(`${import.meta.env.BASE_URL}quack.mp3`);
-    audio.play().catch((e) => console.log('소리 재생 에러:', e));
-
-    // 2. 점프 효과
+    audio.play().catch(e => console.log("소리 재생 에러:", e));
+    
     const duckEl = document.getElementById('my-duck');
-    if (duckEl) {
+    if(duckEl) {
       duckEl.style.transform = 'translateY(-20px)';
-      setTimeout(() => (duckEl.style.transform = 'translateY(0)'), 150);
+      setTimeout(() => duckEl.style.transform = 'translateY(0)', 150);
     }
   };
 
