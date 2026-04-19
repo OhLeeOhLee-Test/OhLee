@@ -71,7 +71,7 @@ export default function Home() {
             self.event.type.includes('touch') ||
             self.event.type.includes('pointer')
           ) {
-            isScrollingDown = self.deltaY > 0; // 모바일: 정방향 (손가락을 위로 올리면 다음 화면)
+            isScrollingDown = self.deltaY < 0; // 모바일: 정방향 (손가락을 위로 올리면 다음 화면)
           } else {
             isScrollingDown = self.deltaY > 0; // 데스크톱: 예환님 마우스에 맞춘 역방향
           }
