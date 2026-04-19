@@ -1,0 +1,68 @@
+/* ⭐️ 화면 전체를 덮는 까만 로딩 배경 */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #111;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* 제일 높은 층! */
+}
+
+/* 부드럽게 나타나는 애니메이션 */
+.loading-content {
+  text-align: center;
+  animation: fadeIn 1s ease-out;
+}
+
+.loading-title {
+  font-size: 4rem;
+  font-weight: bold;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+
+.loading-subtitle {
+  font-size: 1.5rem;
+  color: #888;
+  margin-bottom: 50px;
+}
+
+.enter-btn {
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #111;
+  background-color: #fff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+}
+
+.enter-btn:hover {
+  transform: scale(1.05);
+  background-color: #eee;
+}
+
+.loading-notice {
+  margin-top: 30px;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
