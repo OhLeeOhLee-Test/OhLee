@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Duck.css';
 
 const frameCount = 9;
-const duckImages = Array.from({ length: frameCount }, (_, i) => 
-  `${import.meta.env.BASE_URL}duck_sprites/Duck_${i}.png`
+const duckImages = Array.from(
+  { length: frameCount },
+  (_, i) => `${import.meta.env.BASE_URL}duck_sprites/Duck_${i}.png`
 );
 
 export default function Duck() {
@@ -11,17 +12,16 @@ export default function Duck() {
   const currentSectionRef = useRef(0);
   const targetFrameRef = useRef(4);
 
-  // ⭐️ 1. 오리 클릭 시 "꽥!" 소리 & 점프 효과
   const playQuack = () => {
-    // public 폴더 안에 quack.mp3를 꼭 넣어주세요!
+    // 1. 소리 재생
     const audio = new Audio(`${import.meta.env.BASE_URL}quack.mp3`);
-    audio.play().catch(e => console.log("소리 재생 권한 필요:", e));
-    
-    // 클릭하면 살짝 위로 뛰는(Jump) 효과
+    audio.play().catch((e) => console.log('소리 재생 에러:', e));
+
+    // 2. 점프 효과
     const duckEl = document.getElementById('my-duck');
-    if(duckEl) {
+    if (duckEl) {
       duckEl.style.transform = 'translateY(-20px)';
-      setTimeout(() => duckEl.style.transform = 'translateY(0)', 150);
+      setTimeout(() => (duckEl.style.transform = 'translateY(0)'), 150);
     }
   };
 
@@ -42,14 +42,14 @@ export default function Duck() {
     // ⭐️ 2. 모바일 기기 기울기(Gyroscope) 추적
     const handleOrientation = (e) => {
       if (currentSectionRef.current > 0) return;
-      
+
       // gamma: 왼쪽/오른쪽 기울기 각도 (-90 ~ 90)
       let gamma = e.gamma || 0;
       // UX를 위해 각도를 -45도 ~ 45도 사이로 제한
       gamma = Math.max(-45, Math.min(45, gamma));
-      
+
       // -45~45 각도를 0~1 사이의 비율로 변환
-      const normalized = (gamma + 45) / 90;
+      const normalized = 1 - (gamma + 45) / 90;
       let index = Math.round(normalized * (frameCount - 1));
       targetFrameRef.current = Math.max(0, Math.min(frameCount - 1, index));
     };
@@ -80,11 +80,15 @@ export default function Duck() {
 
   return (
     // ⭐️ onClick 이벤트 추가!
-    <div className="duck-container" onClick={playQuack} style={{ cursor: 'pointer' }}>
-      <img 
+    <div
+      className="duck-container"
+      onClick={playQuack}
+      style={{ cursor: 'pointer' }}
+    >
+      <img
         id="my-duck"
-        src={duckImages[frameIndex]} 
-        alt="Duck" 
+        src={duckImages[frameIndex]}
+        alt="Duck"
         className="duck-sprite"
         style={{ transition: 'transform 0.15s ease-out' }} // 점프를 위한 트랜지션
       />
