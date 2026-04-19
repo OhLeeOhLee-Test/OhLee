@@ -9,50 +9,85 @@ const duckImages = Array.from({ length: frameCount }, (_, i) =>
 export default function Duck() {
   const [frameIndex, setFrameIndex] = useState(4);
   const currentSectionRef = useRef(0);
-  const targetFrameRef = useRef(4); // ⭐️ 오리가 '쳐다봐야 할' 목표 지점
+  const targetFrameRef = useRef(4);
+
+  // ⭐️ 1. 오리 클릭 시 "꽥!" 소리 & 점프 효과
+  const playQuack = () => {
+    // public 폴더 안에 quack.mp3를 꼭 넣어주세요!
+    const audio = new Audio(`${import.meta.env.BASE_URL}quack.mp3`);
+    audio.play().catch(e => console.log("소리 재생 권한 필요:", e));
+    
+    // 클릭하면 살짝 위로 뛰는(Jump) 효과
+    const duckEl = document.getElementById('my-duck');
+    if(duckEl) {
+      duckEl.style.transform = 'translateY(-20px)';
+      setTimeout(() => duckEl.style.transform = 'translateY(0)', 150);
+    }
+  };
 
   useEffect(() => {
-    // 1. Home.jsx가 보낸 텔레파시 수신
     const handleSectionChange = (e) => {
       currentSectionRef.current = e.detail;
     };
     window.addEventListener('sectionChange', handleSectionChange);
 
-    // 2. 마우스 위치를 타겟 프레임으로 변환
+    // 데스크톱 마우스 추적
     const handleMouseMove = (e) => {
-      if (currentSectionRef.current > 0) return; // 메인이 아니면 마우스 무시
-
+      if (currentSectionRef.current > 0) return;
       const mouseX = (e.clientX / window.innerWidth) * 2 - 1;
       let index = Math.round(((mouseX + 1) / 2) * (frameCount - 1));
       targetFrameRef.current = Math.max(0, Math.min(frameCount - 1, index));
     };
-    window.addEventListener('mousemove', handleMouseMove);
 
-    // ⭐️ 3. 대망의 스무딩 루프! (0.05초마다 목표를 향해 고개를 돌립니다)
+    // ⭐️ 2. 모바일 기기 기울기(Gyroscope) 추적
+    const handleOrientation = (e) => {
+      if (currentSectionRef.current > 0) return;
+      
+      // gamma: 왼쪽/오른쪽 기울기 각도 (-90 ~ 90)
+      let gamma = e.gamma || 0;
+      // UX를 위해 각도를 -45도 ~ 45도 사이로 제한
+      gamma = Math.max(-45, Math.min(45, gamma));
+      
+      // -45~45 각도를 0~1 사이의 비율로 변환
+      const normalized = (gamma + 45) / 90;
+      let index = Math.round(normalized * (frameCount - 1));
+      targetFrameRef.current = Math.max(0, Math.min(frameCount - 1, index));
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('deviceorientation', handleOrientation); // 기울기 감지기 부착!
+
+    // 부드러운 고개 돌리기 (기존과 동일)
     let timeoutId;
     const updateFrame = () => {
       setFrameIndex((prev) => {
         let target = currentSectionRef.current > 0 ? 8 : targetFrameRef.current;
-
-        // 목표를 향해 프레임을 1칸씩만 이동
         if (prev < target) return prev + 1;
         if (prev > target) return prev - 1;
-        return prev; // 목표에 도달했으면 정지
+        return prev;
       });
-      timeoutId = setTimeout(updateFrame, 50); // 숫자가 작을수록 고개를 빨리 돌림
+      timeoutId = setTimeout(updateFrame, 50);
     };
     updateFrame();
 
     return () => {
       window.removeEventListener('sectionChange', handleSectionChange);
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('deviceorientation', handleOrientation);
       clearTimeout(timeoutId);
     };
   }, []);
 
   return (
-    <div className="duck-container">
-      <img src={duckImages[frameIndex]} alt="Duck" className="duck-sprite" />
+    // ⭐️ onClick 이벤트 추가!
+    <div className="duck-container" onClick={playQuack} style={{ cursor: 'pointer' }}>
+      <img 
+        id="my-duck"
+        src={duckImages[frameIndex]} 
+        alt="Duck" 
+        className="duck-sprite"
+        style={{ transition: 'transform 0.15s ease-out' }} // 점프를 위한 트랜지션
+      />
     </div>
   );
 }

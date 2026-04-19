@@ -22,7 +22,7 @@ export default function Home() {
       gsap.set('.contact-panel', { xPercent: 100 });
       gsap.set('.ground', { yPercent: 100 });
 
-      // ⭐️ 2. 전체 타임라인 설계 (줌아웃 -> 땅 위 안착 -> 옆으로 이동)
+      // ⭐️ 1. 2단계 오리 우측 이동 영구 삭제 완료!
       const tl = gsap.timeline({
         paused: true,
         defaults: { duration: 1, ease: 'power2.inOut' },
@@ -30,32 +30,25 @@ export default function Home() {
       tlRef.current = tl;
 
       tl.addLabel('step0')
-        // 1단계: 홈 -> 프로젝트 (오리 작아지며 왼쪽 땅 위로 안착)
         .to('.home-panel', { yPercent: -100 }, 'step1')
         .to('.project-panel', { yPercent: 0 }, 'step1')
         .to('.ground', { yPercent: 0 }, 'step1')
         .to('.duck-container', { scale: 0.4, x: '-35vw', y: '20vh' }, 'step1')
         .addLabel('step1')
 
-        // 2단계: 프로젝트 -> 컨택트 (오리가 땅 위를 걸어서 오른쪽으로 이동)
+        // 프로젝트 -> 컨택트 (이제 오리는 가만히 있습니다!)
         .to('.project-panel', { xPercent: -100 }, 'step2')
         .to('.contact-panel', { xPercent: 0 }, 'step2')
-        .to('.duck-container', { x: '35vw' }, 'step2')
         .addLabel('step2');
 
-      // ⭐️ 3. 섹션 이동 함수
       const goToSection = (newIndex) => {
         if (isAnimatingRef.current) return;
-
         isAnimatingRef.current = true;
         currentIndexRef.current = newIndex;
-
-        // 오리에게 현재 섹션 번호 전달 (시선 고정용)
         document.body.setAttribute('data-section', newIndex);
         window.dispatchEvent(
           new CustomEvent('sectionChange', { detail: newIndex })
         );
-
         tl.tweenTo(`step${newIndex}`, {
           onComplete: () => {
             isAnimatingRef.current = false;
@@ -63,19 +56,31 @@ export default function Home() {
         });
       };
 
-      // ⭐️ 4. 마우스 휠 및 터치 감지 (Observer)
+      // ⭐️ 2. 마우스와 모바일 터치 방향 독립 제어 (방향 반전 해결!)
       Observer.create({
         target: window,
         type: 'wheel,touch',
         tolerance: 10,
         preventDefault: true,
-        onDown: () => {
-          if (currentIndexRef.current < 2)
+        onChangeY: (self) => {
+          if (isAnimatingRef.current) return;
+
+          let isScrollingDown;
+          // 터치(모바일)인지 휠(데스크톱)인지 검사해서 방향을 다르게 적용합니다
+          if (
+            self.event.type.includes('touch') ||
+            self.event.type.includes('pointer')
+          ) {
+            isScrollingDown = self.deltaY > 0; // 모바일: 정방향 (손가락을 위로 올리면 다음 화면)
+          } else {
+            isScrollingDown = self.deltaY > 0; // 데스크톱: 예환님 마우스에 맞춘 역방향
+          }
+
+          if (isScrollingDown && currentIndexRef.current < 2) {
             goToSection(currentIndexRef.current + 1);
-        },
-        onUp: () => {
-          if (currentIndexRef.current > 0)
+          } else if (!isScrollingDown && currentIndexRef.current > 0) {
             goToSection(currentIndexRef.current - 1);
+          }
         },
       });
 

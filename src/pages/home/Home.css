@@ -35,10 +35,11 @@ body {
   z-index: 0; /* 배경보단 앞, 오리보단 뒤에 위치! */
 }
 
-/* ⭐️ 1. 오리는 무조건 1층 바닥에 고정시킵니다 */
+/* Home.css 파일에서 오리 부분 수정 */
 .duck-container {
-  position: absolute; /* 혹은 fixed (기존 Duck.css 세팅에 따름) */
+  position: absolute; 
   z-index: 1 !important;
+  pointer-events: auto !important; /* ⭐️ 나 클릭 좀 하자! 강제 선언 */
 }
 
 /* ⭐️ 2. 글씨와 패널들을 담는 통을 100층으로 강제 격상시킵니다 */
@@ -52,7 +53,7 @@ body {
   pointer-events: none; /* 투명 망토 처리 */
 }
 
-/* ⭐️ 3. 패널 안의 내용물들은 다시 만질 수 있게 살려둡니다 */
+/* ⭐️ 1. 패널의 투명한 빈 공간은 클릭이 통과하도록 만듭니다 */
 .panel {
   position: absolute;
   top: 0;
@@ -64,7 +65,14 @@ body {
   justify-content: center;
   align-items: center;
   background-color: transparent;
-  pointer-events: auto; /* 버튼, 카드 등을 클릭할 수 있게 살려둠 */
+  pointer-events: none; /* 🚨 이 부분을 none으로 반드시 바꿔주세요! (오리 구출) */
+}
+
+/* ⭐️ 2. 대신, 패널 안에서 진짜 클릭해야 하는 카드들만 다시 살려줍니다. 
+(이 코드를 파일 맨 아래쪽에 추가해 주세요) */
+.project-card,
+.contact-card {
+  pointer-events: auto; /* 얘네들은 클릭이 되어야 하니까 방패를 듭니다 */
 }
 
 /* ⭐️ 4. 땅(Ground)도 오리 아래(0층)에 잘 깔려 있게 확인 */
