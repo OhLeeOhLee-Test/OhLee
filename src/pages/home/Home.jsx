@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useEffect } from 'react';
+import React, { useLayoutEffect, useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Duck from './duck/Duck.jsx';
 import './Home.css';
@@ -10,9 +10,33 @@ gsap.registerPlugin(Observer);
 export default function Home() {
   const homeRef = useRef();
   const navigate = useNavigate();
-  const tlRef = useRef(); // 타임라인을 외부에서도 제어하기 위해 ref로 보관
+  const tlRef = useRef();
   const currentIndexRef = useRef(0);
   const isAnimatingRef = useRef(false);
+
+  // ⭐️ 현재 시간에 따른 '해(Sun)' 위치 계산기
+  const [sunStyle, setSunStyle] = useState({});
+  const [isDay, setIsDay] = useState(true);
+
+  useEffect(() => {
+    const updateSun = () => {
+      const hour = new Date().getHours();
+      // 아침 6시 ~ 저녁 7시(19시)를 낮으로 설정
+      if (hour >= 6 && hour < 19) {
+        setIsDay(true);
+        const progress = (hour - 6) / 13; // 0(아침) ~ 1(저녁) 사이의 비율
+        setSunStyle({
+          // 시간에 따라 왼쪽(10vw)에서 오른쪽(80vw)으로 이동
+          left: `${10 + progress * 70}vw`,
+          // 포물선 궤적 (한낮엔 높이 뜨고 아침/저녁엔 내려감)
+          top: `${40 - Math.sin(progress * Math.PI) * 30}vh`,
+        });
+      } else {
+        setIsDay(false); // 밤에는 해를 숨김 (혹은 나중에 달을 넣어도 됩니다!)
+      }
+    };
+    updateSun(); // 처음 렌더링될 때 한 번 실행
+  }, []);
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
@@ -111,10 +135,54 @@ export default function Home() {
 
   return (
     <div className="home-container" ref={homeRef}>
+      {/* ⭐️ 1. 하늘과 해, 구름 배경 */}
+      <div className="sky">
+        {isDay && (
+          <img
+            src={`${import.meta.env.BASE_URL}assets/Sun.png`}
+            alt="Sun"
+            className="sun"
+            style={sunStyle}
+          />
+        )}
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
+          alt="Cloud"
+          className="cloud cloud1"
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
+          alt="Cloud"
+          className="cloud cloud2"
+        />
+      </div>
+
       <Duck />
 
-      {/* 배경 땅 */}
-      <div className="ground"></div>
+      {/* ⭐️ 2. 땅과 자연물 오브젝트 */}
+      <div className="ground">
+        {/* 친구분이 그려주신 에셋을 땅 위에 배치합니다 */}
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Tree.png`}
+          alt="Tree"
+          className="deco tree"
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/grass_1.png`}
+          alt="Grass"
+          className="deco grass1"
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/grass_2.png`}
+          alt="Grass"
+          className="deco grass2"
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Rock.png`}
+          alt="Rock"
+          className="deco rock"
+        />
+      </div>
 
       <div className="panels-container">
         {/* 섹션 0: 홈 */}

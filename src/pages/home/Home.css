@@ -4,6 +4,57 @@
   padding: 0;
 }
 
+/* ☁️ 하늘과 구름 세팅 */
+.sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0; /* 가장 뒤에 배경으로 깔림 */
+  overflow: hidden;
+  background-color: #e6f7ff; /* 크레파스 느낌에 어울리는 연한 하늘색 (원하시면 수정!) */
+}
+
+.sun {
+  position: absolute;
+  width: 120px; /* 해 크기 조절 */
+  transition: all 1s ease-in-out;
+}
+
+.cloud {
+  position: absolute;
+  width: 180px;
+  opacity: 0.9;
+  animation: floatCloud linear infinite; /* 무한히 흘러가는 애니메이션 */
+}
+
+/* 첫 번째 구름: 약간 위에, 보통 속도로 */
+.cloud1 {
+  top: 15vh;
+  animation-duration: 40s;
+  animation-delay: -10s; /* 이미 화면 중간쯤부터 시작하게 만듦 */
+}
+
+/* 두 번째 구름: 약간 아래에, 천천히 엇갈리게 */
+.cloud2 {
+  top: 30vh;
+  width: 130px;
+  opacity: 0.7;
+  animation-duration: 60s;
+  animation-delay: -30s;
+}
+
+/* 구름 이동 키프레임 (왼쪽 밖 -> 오른쪽 밖) */
+@keyframes floatCloud {
+  0% {
+    transform: translateX(-200px);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
+}
+
 html,
 body {
   overflow: hidden;
@@ -30,14 +81,42 @@ body {
   bottom: 0;
   left: 0;
   width: 100vw;
-  height: 25vh; /* 화면 밑에서 25%만큼 차지합니다 */
-  background-color: #e0e0e0; /* 임시로 깔아둔 밝은 회색 땅 (나중에 이미지나 다른 색으로 변경 가능) */
-  z-index: 0; /* 배경보단 앞, 오리보단 뒤에 위치! */
+  height: 25vh;
+  background-color: #d2b48c; /* 임시 흙색. 나중에 스케치북 질감 텍스처로 바꿔도 예뻐요! */
+  z-index: 0 !important;
+}
+
+/* 모든 장식물(나무, 돌, 풀)의 공통 속성 */
+.deco {
+  position: absolute;
+  bottom: 100%; /* ⭐️ 이 속성이 데코들을 땅 '위'에 찰싹 붙어있게 만듭니다! */
+  transform-origin: bottom center;
+}
+
+/* 오브젝트별 크기와 위치 잡아주기 */
+.tree {
+  left: 15vw;
+  width: 150px;
+}
+
+.grass1 {
+  left: 30vw;
+  width: 60px;
+}
+
+.rock {
+  right: 25vw;
+  width: 80px;
+}
+
+.grass2 {
+  right: 10vw;
+  width: 50px;
 }
 
 /* Home.css 파일에서 오리 부분 수정 */
 .duck-container {
-  position: absolute; 
+  position: absolute;
   z-index: 1 !important;
   pointer-events: auto !important; /* ⭐️ 나 클릭 좀 하자! 강제 선언 */
 }
@@ -82,6 +161,6 @@ body {
   left: 0;
   width: 100vw;
   height: 25vh;
-  background-color: #e0e0e0;
+  background-color: #288528;
   z-index: 0 !important;
 }

@@ -4,7 +4,7 @@ import './Duck.css';
 const frameCount = 9;
 const duckImages = Array.from(
   { length: frameCount },
-  (_, i) => `${import.meta.env.BASE_URL}duck_sprites/Duck_${i}.png`
+  (_, i) => `${import.meta.env.BASE_URL}assets/duck_sprites/Duck_${i}.png`
 );
 
 export default function Duck() {
@@ -14,13 +14,13 @@ export default function Duck() {
 
   // ⭐️ 1. 순수하게 소리와 점프만 남은 꽥 함수
   const playQuack = () => {
-    const audio = new Audio(`${import.meta.env.BASE_URL}quack.mp3`);
-    audio.play().catch(e => console.log("소리 재생 에러:", e));
-    
+    const audio = new Audio(`${import.meta.env.BASE_URL}assets/quack.mp3`);
+    audio.play().catch((e) => console.log('소리 재생 에러:', e));
+
     const duckEl = document.getElementById('my-duck');
-    if(duckEl) {
+    if (duckEl) {
       duckEl.style.transform = 'translateY(-20px)';
-      setTimeout(() => duckEl.style.transform = 'translateY(0)', 150);
+      setTimeout(() => (duckEl.style.transform = 'translateY(0)'), 150);
     }
   };
 
