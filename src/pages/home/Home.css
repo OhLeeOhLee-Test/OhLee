@@ -182,3 +182,119 @@ body {
   width: 10vw;
   margin-bottom: -1vw;
 }
+
+/* =======================================================
+   💻 2단계: 태블릿 & 작은 PC 화면 (1024px 이하)
+   ======================================================= */
+@media screen and (max-width: 1024px) {
+  /* PC보다 화면이 좁아졌으니, 비율(vw)을 살짝 키워줍니다 */
+  .sun {
+    width: 25vw;
+  }
+  .cloud1 {
+    width: 25vw;
+  }
+  .cloud2 {
+    width: 20vw;
+  }
+  .ground {
+    height: 20%;
+  }
+
+  .tree1 {
+    width: 25vw;
+    margin-bottom: -4vw;
+  }
+  .grass1 {
+    width: 15vw;
+    margin-bottom: -1vw;
+  }
+  .grass1_sub {
+    width: 15vw;
+    margin-bottom: -25vw;
+  }
+  .rock1 {
+    width: 15vw;
+    margin-bottom: -2vw;
+  }
+
+  .tree2 {
+    width: 25vw;
+    margin-bottom: -1vw;
+  }
+  .grass2 {
+    width: 15vw;
+    margin-bottom: -30vw;
+  }
+  .grass2_sub {
+    width: 15vw;
+    margin-bottom: -1vw;
+  }
+  .rock2 {
+    width: 15vw;
+    margin-bottom: -2vw;
+  }
+}
+
+/* =======================================================
+     📱 3단계: 모바일 화면 (스마트폰 / 768px 이하)
+     ======================================================= */
+@media screen and (max-width: 768px) {
+  /* 폰 화면에서는 큼직큼직하게 뻥튀기! */
+  .sun {
+    width: 40vw;
+  }
+  .cloud1 {
+    width: 40vw;
+    top: 15vh;
+  }
+  .cloud2 {
+    width: 35vw;
+    top: 8vh;
+  }
+  .ground {
+    height: 15%;
+  } /* 땅이 너무 높아지지 않게 조절 */
+
+  .tree1 {
+    left: 5%;
+    width: 50vw;
+    margin-bottom: -6vw;
+  }
+  .grass1 {
+    left: 35%;
+    width: 25vw;
+    margin-bottom: -1vw;
+  }
+  .grass1_sub {
+    left: 50%;
+    width: 25vw;
+    margin-bottom: -45vw;
+  }
+  .rock1 {
+    left: 65%;
+    width: 25vw;
+    margin-bottom: -3vw;
+  }
+
+  .tree2 {
+    left: 55%;
+    width: 50vw;
+    margin-bottom: -2vw;
+  }
+  .grass2 {
+    left: 75%;
+    width: 25vw;
+    margin-bottom: -50vw;
+  }
+  .grass2_sub {
+    left: 85%;
+    width: 25vw;
+    margin-bottom: -2vw;
+  }
+  .rock2 {
+    left: 90%;
+    width: 25vw;
+    margin-bottom: -3vw;
+  }
+}
