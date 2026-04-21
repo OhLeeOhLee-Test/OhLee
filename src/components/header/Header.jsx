@@ -22,7 +22,13 @@ export default function Header() {
     <>
       <header className="global-header">
         {/* ⭐️ 로고 클릭 시 0번 섹션으로 */}
-        <div onClick={() => navTo(0)} className="logo-text" style={{cursor: 'pointer'}}>OhLee</div>
+        <div
+          onClick={() => navTo(0)}
+          className="logo-text"
+          style={{ cursor: 'pointer' }}
+        >
+          OhLee
+        </div>
         <button className="hamburger-btn" onClick={toggleMenu}>
           {isOpen ? '✕' : '☰'}
         </button>
@@ -30,9 +36,23 @@ export default function Header() {
 
       <nav className={`fullscreen-menu ${isOpen ? 'open' : ''}`}>
         <ul>
-          <li><div onClick={() => navTo(0)} style={{cursor: 'pointer'}}>Home</div></li>
+          <li>
+            <div onClick={() => navTo(0)} style={{ cursor: 'pointer' }}>
+              Home
+            </div>
+          </li>
           {/* ⭐️ 프로젝트 클릭 시 1번 섹션으로 */}
-          <li><div onClick={() => navTo(1)} style={{cursor: 'pointer'}}>Projects</div></li>
+          <li>
+            <div onClick={() => navTo(1)} style={{ cursor: 'pointer' }}>
+              Projects
+            </div>
+          </li>
+          {/* ⭐️ 컨택트 추가: 클릭 시 2번 섹션으로 */}
+          <li>
+            <div onClick={() => navTo(2)} style={{ cursor: 'pointer' }}>
+              Contact
+            </div>
+          </li>
         </ul>
       </nav>
     </>
