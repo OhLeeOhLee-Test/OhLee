@@ -40,29 +40,55 @@ export default function Home() {
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
-      // ⭐️ 1. 초기 상태 설정
-      // 프로젝트 패널은 아래에, 컨택트 패널은 오른쪽에, 땅은 바닥 아래에 숨깁니다.
+      // ⭐️ 1. 초기 상태 세팅
       gsap.set('.project-panel', { yPercent: 100 });
       gsap.set('.contact-panel', { xPercent: 100 });
-      gsap.set('.ground', { yPercent: 100 });
+      // 1. 초기 상태 세팅
+      gsap.set('.duck-container', {
+        scale: 2.2, // 🔍 줌인 비율 (숫자가 클수록 얼굴이 더 커집니다)
+        x: '0vw', // ↔️ 좌우 이동 (오리가 왼쪽에 치우쳤다면 "5vw"나 "20px"로 밀어보세요)
+        y: '0vh', // ↕️ 상하 이동 (오리 얼굴이 너무 위에 있다면 "10vh" ~ "20vh"로 내려보세요)
+        transformOrigin: '50% 30%', // 📌 줌인의 기준점! (오리 얼굴이 보통 위쪽에 있으니 "50% 30%" 정도로 주면 얼굴을 중심으로 줌아웃됩니다)
+      });
+      gsap.set('.ground', {
+        scale: 3,
+        transformOrigin: '15% bottom',
+        y: '50vh',
+      });
+      gsap.set('.sky', { scale: 1.2, transformOrigin: '15% bottom' });
 
-      // ⭐️ 1. 2단계 오리 우측 이동 영구 삭제 완료!
+      // ⭐️ 추가: 처음에는 나무, 풀, 돌을 투명하게 숨겨서 오리에게만 집중시킵니다!
+      gsap.set('.deco', { opacity: 0 });
+
       const tl = gsap.timeline({
         paused: true,
-        defaults: { duration: 1, ease: 'power2.inOut' },
+        defaults: { duration: 1.2, ease: 'power2.inOut' },
       });
       tlRef.current = tl;
 
       tl.addLabel('step0')
         .to('.home-panel', { yPercent: -100 }, 'step1')
         .to('.project-panel', { yPercent: 0 }, 'step1')
-        .to('.ground', { yPercent: 0 }, 'step1')
-        .to('.duck-container', { scale: 0.4, x: '-35vw', y: '20vh' }, 'step1')
+        .to('.sky', { scale: 1 }, 'step1')
+        .to('.ground', { scale: 1, y: 0 }, 'step1')
+        .to('.deco', { opacity: 1, duration: 1.0 }, 'step1')
+
+        // ⭐️ 여기서 광각 렌즈 모드일 때의 오리 위치를 잡습니다!
+        .to(
+          '.duck-container',
+          {
+            scale: 0.4, // 🔍 줌아웃 후 오리의 최종 크기
+            x: '-35vw', // ↔️ 땅의 왼쪽 편에 서 있게 할 위치
+            y: '30vh', // ↕️ 땅(Ground)의 높이와 발이 딱 맞게 닿는 위치
+          },
+          'step1'
+        )
         .addLabel('step1')
 
-        // 프로젝트 -> 컨택트 (이제 오리는 가만히 있습니다!)
-        .to('.project-panel', { xPercent: -100 }, 'step2')
-        .to('.contact-panel', { xPercent: 0 }, 'step2')
+        // 2단계: 프로젝트 -> 컨택트
+        .to('.project-panel', { xPercent: -100, duration: 3 }, 'step2')
+        .to('.contact-panel', { xPercent: 0, duration: 3 }, 'step2')
+        .to('.ground', { xPercent: -50, duration: 3 }, 'step2')
         .addLabel('step2');
 
       const goToSection = (newIndex) => {
@@ -159,28 +185,39 @@ export default function Home() {
 
       <Duck />
 
-      {/* ⭐️ 2. 땅과 자연물 오브젝트 */}
       <div className="ground">
-        {/* 친구분이 그려주신 에셋을 땅 위에 배치합니다 */}
+        {/* 섹션 2에서 보이는 자연물들 */}
         <img
           src={`${import.meta.env.BASE_URL}assets/Tree.png`}
-          alt="Tree"
-          className="deco tree"
+          className="deco tree1"
+          alt=""
         />
         <img
           src={`${import.meta.env.BASE_URL}assets/grass_1.png`}
-          alt="Grass"
           className="deco grass1"
-        />
-        <img
-          src={`${import.meta.env.BASE_URL}assets/grass_2.png`}
-          alt="Grass"
-          className="deco grass2"
+          alt=""
         />
         <img
           src={`${import.meta.env.BASE_URL}assets/Rock.png`}
-          alt="Rock"
-          className="deco rock"
+          className="deco rock1"
+          alt=""
+        />
+
+        {/* ⭐️ 섹션 3(오른쪽 땅)에서 보일 자연물들 추가! */}
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Tree.png`}
+          className="deco tree2"
+          alt=""
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/grass_2.png`}
+          className="deco grass2"
+          alt=""
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Rock.png`}
+          className="deco rock2"
+          alt=""
         />
       </div>
 

@@ -75,44 +75,21 @@ body {
   overflow: hidden; /* 홈에서만 작동 */
 }
 
-/* ⭐️ 새로 추가된 대지(땅) 스타일 */
-.ground {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  height: 25vh;
-  background-color: #d2b48c; /* 임시 흙색. 나중에 스케치북 질감 텍스처로 바꿔도 예뻐요! */
-  z-index: 0 !important;
-}
-
-/* 모든 장식물(나무, 돌, 풀)의 공통 속성 */
 .deco {
   position: absolute;
-  bottom: 100%; /* ⭐️ 이 속성이 데코들을 땅 '위'에 찰싹 붙어있게 만듭니다! */
+  bottom: 100%;
   transform-origin: bottom center;
 }
 
-/* 오브젝트별 크기와 위치 잡아주기 */
-.tree {
-  left: 15vw;
-  width: 150px;
-}
+/* --- 섹션 2용 데코 (0 ~ 100vw 사이) --- */
+.tree1 { left: 10vw; width: 180px; margin-bottom: -5px; }
+.grass1 { left: 40vw; width: 60px; margin-bottom: -2px; }
+.rock1 { left: 75vw; width: 100px; margin-bottom: -3px; }
 
-.grass1 {
-  left: 30vw;
-  width: 60px;
-}
-
-.rock {
-  right: 25vw;
-  width: 80px;
-}
-
-.grass2 {
-  right: 10vw;
-  width: 50px;
-}
+/* --- 섹션 3용 데코 (100 ~ 200vw 사이) --- */
+.tree2 { left: 120vw; width: 160px; margin-bottom: -5px; }
+.grass2 { left: 150vw; width: 70px; margin-bottom: -2px; }
+.rock2 { left: 180vw; width: 90px; margin-bottom: -3px; }
 
 /* Home.css 파일에서 오리 부분 수정 */
 .duck-container {
@@ -159,8 +136,9 @@ body {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100vw;
+  width: 200vw;
   height: 25vh;
   background-color: #288528;
   z-index: 0 !important;
+  display: flex; /* 데코들을 자유롭게 배치하기 위함 */
 }
