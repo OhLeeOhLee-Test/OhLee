@@ -106,25 +106,43 @@ export default function Home() {
         });
       };
 
-      // ⭐️ 2. 마우스와 모바일 터치 방향 독립 제어 (방향 반전 해결!)
+      // ⭐️ 4. 마우스/터치 감지기 (모바일 스와이프와 PC 휠 완벽 분리!)
       Observer.create({
         target: window,
         type: 'wheel,touch',
-        tolerance: 10,
+        tolerance: 20,
         preventDefault: true,
+
+        // 📱 [모바일 전용] 스와이프 동작
+        onUp: (self) => {
+          if (self.event.type === 'wheel') return; // PC 휠은 여기서 작동 안 함!
+          if (!isAnimatingRef.current && currentIndexRef.current === 0)
+            goToSection(1);
+        },
+        onDown: (self) => {
+          if (self.event.type === 'wheel') return;
+          if (!isAnimatingRef.current && currentIndexRef.current === 1)
+            goToSection(0);
+        },
+        onLeft: (self) => {
+          if (self.event.type === 'wheel') return;
+          if (!isAnimatingRef.current && currentIndexRef.current === 1)
+            goToSection(2);
+        },
+        onRight: (self) => {
+          if (self.event.type === 'wheel') return;
+          if (!isAnimatingRef.current && currentIndexRef.current === 2)
+            goToSection(1);
+        },
+
+        // 💻 [PC 전용] 마우스 휠 동작
         onChangeY: (self) => {
+          if (self.event.type !== 'wheel') return; // 모바일 터치는 무시!
           if (isAnimatingRef.current) return;
 
-          let isScrollingDown;
-          // 터치(모바일)인지 휠(데스크톱)인지 검사해서 방향을 다르게 적용합니다
-          if (
-            self.event.type.includes('touch') ||
-            self.event.type.includes('pointer')
-          ) {
-            isScrollingDown = self.deltaY < 0; // 모바일: 정방향 (손가락을 위로 올리면 다음 화면)
-          } else {
-            isScrollingDown = self.deltaY > 0; // 데스크톱: 예환님 마우스에 맞춘 역방향
-          }
+          // ⭐️ PC 휠을 몸쪽으로 내릴 때 (정방향) 다음 섹션으로 갑니다.
+          // 혹시라도 예환님 마우스 세팅 때문에 여전히 반대라면 > 를 < 로만 바꿔주세요!
+          let isScrollingDown = self.deltaY > 0;
 
           if (isScrollingDown && currentIndexRef.current < 2) {
             goToSection(currentIndexRef.current + 1);
