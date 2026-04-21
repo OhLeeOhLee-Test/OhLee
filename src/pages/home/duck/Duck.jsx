@@ -14,7 +14,7 @@ export default function Duck() {
 
   // ⭐️ 1. 순수하게 소리와 점프만 남은 꽥 함수
   const playQuack = () => {
-    const audio = new Audio(`${import.meta.env.BASE_URL}assets/quack.mp3`);
+    const audio = new Audio(`${import.meta.env.BASE_URL}assets/Quack.mp3`);
     audio.play().catch((e) => console.log('소리 재생 에러:', e));
 
     const duckEl = document.getElementById('my-duck');

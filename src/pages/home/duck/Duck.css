@@ -3,16 +3,16 @@
   /* ⭐️ top, left 50%는 유지하되 transform은 지웁니다! */
   top: 50%;
   left: 50%;
-  
+
   /* GSAP이 편하게 다룰 수 있도록 시작 위치를 잡아줍니다. */
-  translate: -50% -50%; 
-  
+  translate: -50% -50%;
+
   z-index: 0;
   pointer-events: none;
 }
 
 /* 아래 .duck-sprite 코드는 기존 그대로 둡니다 */
 .duck-sprite {
-  width: 300px;
+  width: 100vw;
   height: auto;
 }

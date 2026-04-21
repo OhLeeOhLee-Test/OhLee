@@ -14,28 +14,27 @@ export default function Home() {
   const currentIndexRef = useRef(0);
   const isAnimatingRef = useRef(false);
 
-  // ⭐️ 현재 시간에 따른 '해(Sun)' 위치 계산기
+  // ⭐️ 1. 해(Sun) 위치 계산기 수정 (동 -> 서)
   const [sunStyle, setSunStyle] = useState({});
   const [isDay, setIsDay] = useState(true);
 
   useEffect(() => {
     const updateSun = () => {
       const hour = new Date().getHours();
-      // 아침 6시 ~ 저녁 7시(19시)를 낮으로 설정
+      // 아침 6시 ~ 저녁 7시(19시)
       if (hour >= 6 && hour < 19) {
         setIsDay(true);
-        const progress = (hour - 6) / 13; // 0(아침) ~ 1(저녁) 사이의 비율
+        const progress = (hour - 6) / 13; // 0 ~ 1 비율
         setSunStyle({
-          // 시간에 따라 왼쪽(10vw)에서 오른쪽(80vw)으로 이동
-          left: `${10 + progress * 70}vw`,
-          // 포물선 궤적 (한낮엔 높이 뜨고 아침/저녁엔 내려감)
+          // 🚨 수정된 부분: 오른쪽(80vw)에서 시작해서 왼쪽(10vw)으로 이동합니다! (동->서)
+          left: `${80 - progress * 70}vw`,
           top: `${40 - Math.sin(progress * Math.PI) * 30}vh`,
         });
       } else {
-        setIsDay(false); // 밤에는 해를 숨김 (혹은 나중에 달을 넣어도 됩니다!)
+        setIsDay(false);
       }
     };
-    updateSun(); // 처음 렌더링될 때 한 번 실행
+    updateSun();
   }, []);
 
   useLayoutEffect(() => {
@@ -45,7 +44,7 @@ export default function Home() {
       gsap.set('.contact-panel', { xPercent: 100 });
       // 1. 초기 상태 세팅
       gsap.set('.duck-container', {
-        scale: 2.2, // 🔍 줌인 비율 (숫자가 클수록 얼굴이 더 커집니다)
+        scale: 1, // 🔍 줌인 비율 (숫자가 클수록 얼굴이 더 커집니다)
         x: '0vw', // ↔️ 좌우 이동 (오리가 왼쪽에 치우쳤다면 "5vw"나 "20px"로 밀어보세요)
         y: '0vh', // ↕️ 상하 이동 (오리 얼굴이 너무 위에 있다면 "10vh" ~ "20vh"로 내려보세요)
         transformOrigin: '50% 30%', // 📌 줌인의 기준점! (오리 얼굴이 보통 위쪽에 있으니 "50% 30%" 정도로 주면 얼굴을 중심으로 줌아웃됩니다)
@@ -77,9 +76,9 @@ export default function Home() {
         .to(
           '.duck-container',
           {
-            scale: 0.4, // 🔍 줌아웃 후 오리의 최종 크기
+            scale: 0.2, // 🔍 줌아웃 후 오리의 최종 크기
             x: '-35vw', // ↔️ 땅의 왼쪽 편에 서 있게 할 위치
-            y: '30vh', // ↕️ 땅(Ground)의 높이와 발이 딱 맞게 닿는 위치
+            y: '50vh', // ↕️ 땅(Ground)의 높이와 발이 딱 맞게 닿는 위치
           },
           'step1'
         )
@@ -204,34 +203,45 @@ export default function Home() {
       <Duck />
 
       <div className="ground">
-        {/* 섹션 2에서 보이는 자연물들 */}
+        {/* --- 섹션 2에서 보이는 자연물들 --- */}
         <img
           src={`${import.meta.env.BASE_URL}assets/Tree.png`}
           className="deco tree1"
           alt=""
         />
         <img
-          src={`${import.meta.env.BASE_URL}assets/grass_1.png`}
+          src={`${import.meta.env.BASE_URL}assets/Grass_1.png`}
           className="deco grass1"
           alt=""
         />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Grass_2.png`}
+          className="deco grass1_sub"
+          alt=""
+        />{' '}
+        {/* 1번 풀 옆에 2번 풀 추가! */}
         <img
           src={`${import.meta.env.BASE_URL}assets/Rock.png`}
           className="deco rock1"
           alt=""
         />
-
-        {/* ⭐️ 섹션 3(오른쪽 땅)에서 보일 자연물들 추가! */}
+        {/* --- 섹션 3에서 보일 자연물들 --- */}
         <img
           src={`${import.meta.env.BASE_URL}assets/Tree.png`}
           className="deco tree2"
           alt=""
         />
         <img
-          src={`${import.meta.env.BASE_URL}assets/grass_2.png`}
+          src={`${import.meta.env.BASE_URL}assets/Grass_2.png`}
           className="deco grass2"
           alt=""
         />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Grass_1.png`}
+          className="deco grass2_sub"
+          alt=""
+        />{' '}
+        {/* 2번 풀 옆에 1번 풀 추가! */}
         <img
           src={`${import.meta.env.BASE_URL}assets/Rock.png`}
           className="deco rock2"
