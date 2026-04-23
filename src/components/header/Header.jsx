@@ -1,60 +1,43 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // 현재 주소 확인용
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // ⭐️ 섹션 이동 전령 함수
+  // ⭐️ 섹션 이동 전령 함수 완벽 수정!
   const navTo = (index) => {
     setIsOpen(false);
-    // 1. 먼저 홈으로 이동
-    navigate('/');
-    // 2. 홈에 있는 오리와 섹션들에게 몇 번으로 갈지 알림
-    setTimeout(() => {
+    
+    // 현재 우리가 홈(/)이나 프로젝트 화면에 있을 때는 애니메이션을 위해 신호만 쏩니다!
+    const currentPath = location.pathname;
+    if (currentPath === '/' || currentPath === '/projects/Projects') {
       window.dispatchEvent(new CustomEvent('navToSection', { detail: index }));
-    }, 50); // 페이지 전환 시간을 고려한 미세한 지연
+    } else {
+      // 만약 상세 실험 페이지(/project/fluid 등)에 있다면 애니메이션 없이 즉시 이동
+      if (index === 0 || index === 2) navigate('/');
+      if (index === 1) navigate('/projects/Projects');
+    }
   };
 
   return (
-    <>
-      <header className="global-header">
-        {/* ⭐️ 로고 클릭 시 0번 섹션으로 */}
-        <div
-          onClick={() => navTo(0)}
-          className="logo-text"
-          style={{ cursor: 'pointer' }}
-        >
-          OhLee
-        </div>
+    <header className="global-header">
+      <div className="header-content">
+        <div onClick={() => navTo(0)} className="logo-text" style={{cursor: 'pointer'}}>OhLee</div>
+        <nav className={`header-nav ${isOpen ? 'show' : ''}`}>
+          <ul>
+            <li><div onClick={() => navTo(0)} style={{cursor: 'pointer'}}>Home</div></li>
+            <li><div onClick={() => navTo(1)} style={{cursor: 'pointer'}}>Projects</div></li>
+            <li><div onClick={() => navTo(2)} style={{cursor: 'pointer'}}>Contact</div></li>
+          </ul>
+        </nav>
         <button className="hamburger-btn" onClick={toggleMenu}>
           {isOpen ? '✕' : '☰'}
         </button>
-      </header>
-
-      <nav className={`fullscreen-menu ${isOpen ? 'open' : ''}`}>
-        <ul>
-          <li>
-            <div onClick={() => navTo(0)} style={{ cursor: 'pointer' }}>
-              Home
-            </div>
-          </li>
-          {/* ⭐️ 프로젝트 클릭 시 1번 섹션으로 */}
-          <li>
-            <div onClick={() => navTo(1)} style={{ cursor: 'pointer' }}>
-              Projects
-            </div>
-          </li>
-          {/* ⭐️ 컨택트 추가: 클릭 시 2번 섹션으로 */}
-          <li>
-            <div onClick={() => navTo(2)} style={{ cursor: 'pointer' }}>
-              Contact
-            </div>
-          </li>
-        </ul>
-      </nav>
-    </>
+      </div>
+    </header>
   );
 }

@@ -4,6 +4,29 @@
   padding: 0;
 }
 
+/* (Home.css 파일 하단에 추가) */
+.home-panel {
+  display: flex;
+  justify-content: flex-start; /* ⭐️ 왼쪽 정렬 */
+  align-items: center; /* 세로 중앙 */
+  padding-left: 10vw; /* 왼쪽 여백 */
+}
+
+.home-content {
+  text-align: left;
+  color: #333;
+}
+
+.creator-name {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.creator-desc {
+  font-size: 1.5rem;
+  color: #666;
+}
+
 /* ☁️ 하늘과 구름 세팅 */
 .sky {
   position: absolute;
@@ -20,7 +43,11 @@
 .sun {
   position: absolute;
   width: 20vw; /* 기존 120px -> 화면 너비의 8% 크기로 변신! */
-  transition: all 1s ease-in-out;
+}
+
+.cloud-stage {
+  pointer-events: none; /* 구름이 클릭을 방해하지 않게 */
+  z-index: 1;
 }
 
 /* ☁️ 구름 크기와 이동 거리를 vw로 변경 */
@@ -85,6 +112,22 @@ body {
   pointer-events: auto !important; /* ⭐️ 나 클릭 좀 하자! 강제 선언 */
 }
 
+/* ⭐️ 톰과 제리 크로징 효과 마법 */
+.iris-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* 정확히 화면 정중앙 */
+  border-radius: 50%; /* 완벽한 동그라미 */
+  
+  /* 구멍(본체)은 투명하고, 테두리 그림자가 화면 전체를 까맣게 덮습니다 */
+  box-shadow: 0 0 0 200vmax #000; 
+  
+  z-index: 9999; /* 화면에서 가장 앞에 오도록! */
+  pointer-events: none; /* 클릭 방해 금지 */
+  display: none; /* 평소에는 숨겨둠 */
+}
+
 /* ⭐️ 2. 글씨와 패널들을 담는 통을 100층으로 강제 격상시킵니다 */
 .panels-container {
   position: absolute; /* relative 대신 absolute로 화면을 완전히 덮어버립니다 */
@@ -94,6 +137,19 @@ body {
   height: 100vh;
   z-index: 100 !important; /* 오리가 절대 못 뚫고 오게 숫자를 확 높였습니다 */
   pointer-events: none; /* 투명 망토 처리 */
+}
+
+/* 1. 거대한 컨테이너와 패널들은 클릭이 그냥 뚫고 지나가게 둡니다 */
+.panels-container,
+.panel {
+  pointer-events: none;
+}
+
+/* 2. 하지만 진짜 내용을 담은 알맹이들은 클릭을 쟁취합니다! */
+.home-content,
+.contact-card,
+.project-panel h2 {
+  pointer-events: auto;
 }
 
 /* ⭐️ 1. 패널의 투명한 빈 공간은 클릭이 통과하도록 만듭니다 */

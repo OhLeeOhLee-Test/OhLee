@@ -1,0 +1,118 @@
+/* =========================================================
+   오이 저장소 전체 레이아웃
+========================================================= */
+.storage-container {
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #f0f5f0; /* 신선한 오이를 닮은 연한 톤 */
+  padding: 80px 0; /* 위아래 여백 */
+  position: relative;
+  overflow-x: hidden;
+}
+
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.storage-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.storage-header h1 {
+  font-size: 2.5rem;
+  color: #288528;
+  margin-bottom: 10px;
+}
+
+/* =========================================================
+   ⭐️ 핵심: 가로 슬라이드 (Scroll Snap)
+========================================================= */
+.cucumber-slider {
+  display: flex;
+  gap: 30px;
+  padding: 20px 50vw 50px 30px; /* 오른쪽 끝까지 스크롤 되도록 여백 확보 */
+  overflow-x: auto;
+
+  /* 스크롤할 때 카드 단위로 '착!' 달라붙게 만드는 마법의 속성 */
+  scroll-snap-type: x mandatory;
+
+  /* 스크롤바 숨기기 (깔끔하게) */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.cucumber-slider::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* 개별 오이 카드 */
+.cucumber-card {
+  /* 카드가 항상 화면 중앙에 달라붙도록 설정 */
+  scroll-snap-align: center;
+
+  flex: 0 0 300px; /* 카드 너비 고정 (모바일에서도 유지) */
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cucumber-card:hover {
+  transform: translateY(-10px); /* 마우스 올리면 살짝 떠오름 */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.cucumber-image-placeholder {
+  height: 200px;
+  background-color: #e8f5e9; /* 연한 초록색 배경 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 3px dashed #c8e6c9; /* 스크랩북 느낌의 절취선 */
+}
+
+.cucumber-info {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.cucumber-info h2 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: #111;
+}
+
+.cucumber-info p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 20px;
+  flex-grow: 1;
+}
+
+.enter-text {
+  align-self: flex-end;
+  font-weight: bold;
+  color: #288528;
+}
+
+/* 모바일 화면에서는 카드를 화면 너비의 80%로 맞춰서 옆 카드가 살짝 보이게 연출 */
+@media screen and (max-width: 768px) {
+  .cucumber-card {
+    flex: 0 0 80vw;
+  }
+}

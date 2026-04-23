@@ -4,7 +4,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #111; 
+  background-color: #111;
   color: white;
   display: flex;
   justify-content: center;
@@ -28,6 +28,22 @@
   font-size: 1.5rem;
   color: #888;
   margin-bottom: 50px;
+}
+
+/* ⭐️ 톰과 제리 크로징 효과 마법 */
+.iris-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* 정확히 화면 정중앙 */
+  border-radius: 50%; /* 완벽한 동그라미 */
+
+  /* 구멍(본체)은 투명하고, 테두리 그림자가 화면 전체를 까맣게 덮습니다 */
+  box-shadow: 0 0 0 200vmax #000;
+
+  z-index: 9999; /* 화면에서 가장 앞에 오도록! */
+  pointer-events: none; /* 클릭 방해 금지 */
+  display: none; /* 평소에는 숨겨둠 */
 }
 
 .enter-btn {
@@ -56,6 +72,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
