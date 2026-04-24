@@ -29,7 +29,7 @@ export default function Project() {
     }
   }, [shouldPlayIris]);
 
-  // ⭐️ 2. 오류의 핵심 해결: 무조건 '/' 로 보냅니다.
+  // ⭐️ 2. 헤더 메뉴를 통한 이동 처리 (0: 홈, 1: 무시, 2: 우편함)
   const handleExit = (targetIndex) => {
     if (targetIndex === 1) return; // 자기를 누르면 무시
 
@@ -49,6 +49,27 @@ export default function Project() {
       ease: 'power2.inOut',
       onComplete: () => {
         // 무조건 Home으로 보냄! Home이 알아서 판단합니다.
+        navigate('/');
+      },
+    });
+  };
+
+  // ⭐️ 3. [NEW] '무대로 돌아가기' 전용 함수 (풍차가 있는 1번 섹션으로!)
+  const handleBackToWindmill = () => {
+    sessionStorage.setItem('playIris', 'true');
+    sessionStorage.setItem('goToWindmill', 'true'); // 🚨 풍차로 가라는 전용 메모 발급!
+
+    gsap.set('.iris-overlay', {
+      display: 'block',
+      width: '300vmax',
+      height: '300vmax',
+    });
+    gsap.to('.iris-overlay', {
+      width: '0px',
+      height: '0px',
+      duration: 1.5,
+      ease: 'power2.inOut',
+      onComplete: () => {
         navigate('/');
       },
     });
@@ -94,7 +115,8 @@ export default function Project() {
 
   return (
     <div className="storage-container">
-      <button className="back-btn" onClick={() => handleExit(0)}>
+      {/* ⭐️ 버튼에 새로운 풍차행 함수를 연결해 줍니다! */}
+      <button className="back-btn" onClick={handleBackToWindmill}>
         ← 무대로 돌아가기
       </button>
 
@@ -122,7 +144,6 @@ export default function Project() {
         ))}
       </div>
 
-      {/* ⭐️ 가장 중요: 티켓 상태에 따라 초기 CSS를 미리 세팅! */}
       <div
         className="iris-overlay"
         style={{

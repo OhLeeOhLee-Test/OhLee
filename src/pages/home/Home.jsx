@@ -1,62 +1,27 @@
-import React, { useLayoutEffect, useRef, useEffect, useState } from 'react';
+import React, {
+  useLayoutEffect,
+  useRef,
+  useEffect,
+  useState,
+  useMemo,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Duck from './duck/Duck.jsx';
 import './Home.css';
 import gsap from 'gsap';
 import { Observer } from 'gsap/Observer';
+import { getStageConfig } from './stageConfig';
 
 gsap.registerPlugin(Observer);
 
-const STAGE_CONFIG = {
-  duck: {
-    outDir: 'bottom',
-    positions: {
-      sec0: { x: '25vw', y: '15vh', scale: 1 },
-      sec1: { x: '-35vw', y: '30vh', scale: 0.4 },
-      sec2: { x: '-35vw', y: '30vh', scale: 0.4 },
-    },
-  },
-  sky: {
-    sun: { outDir: 'top' },
-    cloud1: { outDir: 'top' },
-    cloud2: { outDir: 'top' },
-  },
-  sec1: {
-    tree: { left: '5%', bottom: '-3vw', width: '20vw', outDir: 'bottom' },
-    grass1: { left: '20%', bottom: '-0.5vw', width: '10vw', outDir: 'left' },
-    grass1_sub: {
-      left: '28%',
-      bottom: '-20vw',
-      width: '10vw',
-      outDir: 'bottom',
-    },
-    rock: { left: '38%', bottom: '-1vw', width: '10vw', outDir: 'bottom' },
-    windmill: {
-      left: '45vw',
-      bottom: '10vh',
-      width: '250px',
-      zIndex: 10,
-      outDir: 'bottom',
-    },
-  },
-  sec2: {
-    tree: { left: '60%', bottom: '-0.5vw', width: '20vw', outDir: 'bottom' },
-    grass2: { left: '75%', bottom: '-25vw', width: '10vw', outDir: 'bottom' },
-    grass2_sub: {
-      left: '85%',
-      bottom: '-0.5vw',
-      width: '10vw',
-      outDir: 'bottom',
-    },
-    rock: { left: '92%', bottom: '-1vw', width: '10vw', outDir: 'bottom' },
-    mailbox: {
-      left: '85vw',
-      bottom: '10vh',
-      width: '150px',
-      zIndex: 10,
-      outDir: 'bottom',
-    },
-  },
+// ⭐️ 리액트가 렌더링할 때마다 스타일을 덮어씌우는 걸 막기 위해 아예 밖에다 빼둔 고정 스타일
+const CLOUD_WRAPPER_STYLE = {
+  position: 'absolute',
+  width: '100%',
+  height: '100%',
+  top: 0,
+  left: 0,
+  pointerEvents: 'none',
 };
 
 export default function Home() {
@@ -64,59 +29,41 @@ export default function Home() {
   const navigate = useNavigate();
   const currentIndexRef = useRef(0);
   const isAnimatingRef = useRef(false);
-
-  const [sunStyle, setSunStyle] = useState({});
-  const [isDay, setIsDay] = useState(true);
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
-
-  // ⭐️ 1. 티켓 유무를 화면 렌더링 전(초기 상태)에 확인합니다! (번쩍임 방지)
   const [shouldPlayIris] = useState(
     () => sessionStorage.getItem('playIris') === 'true'
   );
 
-  useLayoutEffect(() => {
-    if (shouldPlayIris) {
-      sessionStorage.removeItem('playIris');
-      gsap.set('.iris-overlay', {
-        display: 'block',
-        width: '0px',
-        height: '0px',
-      });
-      gsap.to('.iris-overlay', {
-        width: '300vmax', // 넉넉하게 키움
-        height: '300vmax',
-        duration: 1.5, // 딜레이 없이 1.5초로 산뜻하게!
-        ease: 'power2.inOut',
-        onComplete: () => gsap.set('.iris-overlay', { display: 'none' }),
-      });
-    }
-  }, [shouldPlayIris]);
+  const getDeviceType = () => {
+    if (window.innerWidth <= 768) return 'mobile';
+    if (window.innerWidth <= 1024) return 'tablet';
+    return 'pc';
+  };
+  const [deviceType, setDeviceType] = useState(getDeviceType());
 
-  useEffect(() => {
-    if (isMailboxOpen) {
-      gsap.fromTo(
-        '.contact-card',
-        { scale: 0.2, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.5)' }
-      );
-    }
-  }, [isMailboxOpen]);
+  // ⭐️ 리액트 방어 1: 기기가 바뀌지 않는 한 설정값을 재생성하지 않음 (GSAP 속성 보호)
+  const STAGE_CONFIG = useMemo(() => getStageConfig(deviceType), [deviceType]);
 
-  useEffect(() => {
-    const updateSun = () => {
-      const hour = new Date().getHours();
-      if (hour >= 6 && hour < 19) {
-        setIsDay(true);
-        const progress = (hour - 6) / 13;
-        setSunStyle({
-          left: `${80 - progress * 70}vw`,
-          top: `${40 - Math.sin(progress * Math.PI) * 30}vh`,
-        });
-      } else {
-        setIsDay(false);
-      }
+  // ⭐️ 리액트 방어 2: 태양 위치도 처음 한 번만 계산해서 영구 고정 (화면 깜빡임 원천 차단)
+  const [timeData] = useState(() => {
+    const hour = new Date().getHours();
+    const isDay = hour >= 6 && hour < 19;
+    const progress = isDay ? (hour - 6) / 13 : 0;
+    return {
+      isDay,
+      sunStyle: isDay
+        ? {
+            left: `${80 - progress * 70}vw`,
+            top: `${40 - Math.sin(progress * Math.PI) * 30}vh`,
+          }
+        : {},
     };
-    updateSun();
+  });
+
+  useEffect(() => {
+    const handleResize = () => setDeviceType(getDeviceType());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -128,12 +75,58 @@ export default function Home() {
     return () => (document.body.style.overflow = 'auto');
   }, []);
 
+  useEffect(() => {
+    if (isMailboxOpen)
+      gsap.fromTo(
+        '.contact-card',
+        { scale: 0.2, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.5)' }
+      );
+  }, [isMailboxOpen]);
+
   const handleWindmillClick = () => {
     if (isAnimatingRef.current) return;
     isAnimatingRef.current = true;
+    gsap.to('.duck-container', {
+      x: '10vw',
+      duration: 2.5,
+      ease: 'power1.inOut',
+      onComplete: () => {
+        sessionStorage.setItem('playIris', 'true');
+        gsap.set('.iris-overlay', {
+          display: 'block',
+          width: '300vmax',
+          height: '300vmax',
+        });
+        gsap.to('.iris-overlay', {
+          width: '0px',
+          height: '0px',
+          duration: 1.5,
+          ease: 'power2.inOut',
+          onComplete: () => navigate('/projects/Projects'),
+        });
+      },
+    });
+  };
 
+  const handleMailboxClick = () => {
+    if (isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
+    gsap.to('.duck-container', {
+      x: '10vw',
+      duration: 2.5,
+      ease: 'power1.inOut',
+      onComplete: () => {
+        isAnimatingRef.current = false;
+        setIsMailboxOpen(true);
+      },
+    });
+  };
+
+  const handleHeaderProjectsClick = () => {
+    if (isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
     sessionStorage.setItem('playIris', 'true');
-
     gsap.set('.iris-overlay', {
       display: 'block',
       width: '300vmax',
@@ -144,12 +137,27 @@ export default function Home() {
       height: '0px',
       duration: 1.5,
       ease: 'power2.inOut',
-      onComplete: () => {
-        isAnimatingRef.current = false;
-        navigate('/projects/Projects');
-      },
+      onComplete: () => navigate('/projects/Projects'),
     });
   };
+
+  useLayoutEffect(() => {
+    if (shouldPlayIris) {
+      sessionStorage.removeItem('playIris');
+      gsap.set('.iris-overlay', {
+        display: 'block',
+        width: '0px',
+        height: '0px',
+      });
+      gsap.to('.iris-overlay', {
+        width: '300vmax',
+        height: '300vmax',
+        duration: 1.5,
+        ease: 'power2.inOut',
+        onComplete: () => gsap.set('.iris-overlay', { display: 'none' }),
+      });
+    }
+  }, [shouldPlayIris]);
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
@@ -164,28 +172,33 @@ export default function Home() {
           : '0vh';
 
         if (targetSection === 0 && !isDuck) isOut = true;
+
         if (isOut) {
-          if (dir === 'left') return { x: '-250vw', y: inY };
-          if (dir === 'right') return { x: '250vw', y: inY };
-          if (dir === 'top') return { x: inX, y: '-250vh' };
-          if (dir === 'bottom') return { x: inX, y: '250vh' };
+          // ⭐️ 대각선 차단 1: 숨길 때는 X좌표를 절대 바꾸지 않고 오로지 Y(수직)로만 올리거나 내립니다!
+          return { x: inX, y: dir === 'top' ? '-250vh' : '250vh' };
         }
         return { x: inX, y: inY };
       };
 
       gsap.set('.project-panel, .contact-panel', { opacity: 0, autoAlpha: 0 });
-      const initDuck = STAGE_CONFIG.duck.positions.sec0;
-      gsap.set('.duck-container', {
-        x: initDuck.x,
-        y: initDuck.y,
-        scaleX: initDuck.scale,
-        scaleY: initDuck.scale,
-        opacity: 1,
-      });
+      gsap.set('.sky-bg', { autoAlpha: 0 });
+      gsap.set('.ground-bg', { y: '100%' });
 
-      gsap.utils.toArray('.puppet:not(.duck-container)').forEach((el) => {
-        const pos = getPos(el, true, 0);
-        gsap.set(el, { x: pos.x, y: pos.y, opacity: 1 });
+      // 처음 시작 시 완벽 세팅
+      gsap.utils.toArray('.puppet').forEach((el) => {
+        const isDuck = el.classList.contains('duck-container');
+        const pos = getPos(el, false, 0);
+        if (isDuck) {
+          gsap.set(el, {
+            x: pos.x,
+            y: pos.y,
+            scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
+            scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
+            opacity: 1,
+          });
+        } else {
+          gsap.set(el, { x: pos.x, y: pos.y, opacity: 1 });
+        }
       });
 
       const goToSection = (newIndex, isMenu = false, openContact = false) => {
@@ -213,50 +226,82 @@ export default function Home() {
             },
           });
 
+          // ⭐️ 대각선 차단 2: 나갈 때는 X 건드리지 말고 Y로만 "일직선"으로 떨어져라!
           tl.to(
             '.puppet',
             {
-              x: (i, el) => getPos(el, true, oldIndex).x,
               y: (i, el) => getPos(el, true, oldIndex).y,
               duration: 0.8,
               stagger: 0.05,
               ease: 'back.in(1.2)',
             },
-            '+=0.1'
-          )
-            .to('.panel', { autoAlpha: 0, duration: 0.3 }, '<')
-            .set(`.panel`, { autoAlpha: 0 })
+            0
+          ).to('.panel', { autoAlpha: 0, duration: 0.3 }, 0);
+
+          const enterTime = 0.8;
+
+          // 배경 전환
+          if (newIndex === 0) {
+            tl.to('.sky-bg', { autoAlpha: 0, duration: 0.8 }, enterTime).to(
+              '.ground-bg',
+              { y: '100%', duration: 0.8, ease: 'power2.in' },
+              enterTime
+            );
+          } else {
+            tl.to('.sky-bg', { autoAlpha: 1, duration: 1 }, enterTime).to(
+              '.ground-bg',
+              { y: '0%', duration: 1, ease: 'power2.out' },
+              enterTime
+            );
+          }
+
+          // ⭐️ 대각선 차단 3: 화면 밖 바닥 밑에 숨어있을 때, 몰래 새로운 X 좌표로 "순간이동" 시킨다!
+          tl.set(`.panel`, { autoAlpha: 0 }, enterTime)
             .set(
               newIndex === 0
                 ? '.home-panel'
                 : newIndex === 1
                 ? '.project-panel'
                 : '.contact-panel',
-              { autoAlpha: 1 }
+              { autoAlpha: 1 },
+              enterTime
             )
-            .set('.puppet', {
-              x: (i, el) => getPos(el, true, newIndex).x,
-              y: (i, el) => getPos(el, true, newIndex).y,
-            })
-            .set('.duck-container', {
-              scaleX: duckPos.scale,
-              scaleY: duckPos.scale,
-            })
-            .set('.ground', { x: newIndex === 2 ? '-50vw' : '0vw' })
-            .to('.puppet', {
-              x: (i, el) => getPos(el, false, newIndex).x,
+            .set(
+              '.puppet',
+              {
+                x: (i, el) => getPos(el, false, newIndex).x, // 몰래 x 이동!
+                y: (i, el) => getPos(el, true, newIndex).y, // 여전히 바닥(y)에 숨어있음
+              },
+              enterTime
+            )
+            .set(
+              '.duck-container',
+              { scaleX: duckPos.scale, scaleY: duckPos.scale },
+              enterTime
+            )
+            .set('.ground', { x: newIndex === 2 ? STAGE_CONFIG.groundOffset : '0vw' }, enterTime)
+
+          // ⭐️ 대각선 차단 4: 등장할 때는 X 건드리지 말고 Y로만 "일직선"으로 올라와라!
+          // 단, 메인 화면(0번)으로 올 때는 '오리'만 올라오고 다른 애들은 바닥에 가만히 숨어있어라!
+          const enterTargets = newIndex === 0 ? '.duck-container' : '.puppet';
+          tl.to(
+            enterTargets,
+            {
               y: (i, el) => getPos(el, false, newIndex).y,
               duration: 1,
               stagger: 0.05,
               ease: 'elastic.out(1, 0.5)',
-            });
+            },
+            enterTime
+          );
         } else {
+          // 걷기 (카메라 패닝)
           const tl = gsap.timeline({
             onComplete: () => {
               isAnimatingRef.current = false;
             },
           });
-          const xMove = newIndex === 2 ? '-50vw' : '0vw';
+          const xMove = newIndex === 2 ? STAGE_CONFIG.groundOffset : '0vw';
 
           tl.to('.duck-container', {
             scaleX: targetScaleX,
@@ -290,13 +335,13 @@ export default function Home() {
         }
       };
 
-      // ⭐️ 2. 프로젝트에서 헤더 메뉴를 통해 돌아온 경우 (오류 해결 핵심!)
       if (sessionStorage.getItem('goToContact') === 'true') {
         sessionStorage.removeItem('goToContact');
-        // 컴포넌트 렌더링 충돌을 막기 위해 0.1초 뒤에 애니메이션 실행
-        setTimeout(() => {
-          goToSection(2, true, true);
-        }, 100);
+        setTimeout(() => goToSection(2, true, true), 100);
+      }
+      if (sessionStorage.getItem('goToWindmill') === 'true') {
+        sessionStorage.removeItem('goToWindmill');
+        setTimeout(() => goToSection(1, true, false), 100);
       }
 
       Observer.create({
@@ -315,7 +360,7 @@ export default function Home() {
 
       const handleNavSignal = (e) => {
         const target = e.detail;
-        if (target === 1) handleWindmillClick();
+        if (target === 1) handleHeaderProjectsClick();
         else if (currentIndexRef.current !== target)
           goToSection(target, true, target === 2);
         else if (target === 2) setIsMailboxOpen(true);
@@ -325,30 +370,25 @@ export default function Home() {
       return () => window.removeEventListener('navToSection', handleNavSignal);
     }, homeRef);
     return () => ctx.revert();
-  }, [navigate]);
+  }, [navigate, STAGE_CONFIG]);
 
   return (
     <div className="home-container" ref={homeRef}>
       <div className="sky">
-        {isDay && (
+        <div className="sky-bg"></div>
+        {timeData.isDay && (
           <img
             src={`${import.meta.env.BASE_URL}assets/Sun.png`}
             alt="Sun"
             className="sun puppet"
-            style={sunStyle}
+            style={timeData.sunStyle}
             data-out-dir={STAGE_CONFIG.sky.sun.outDir}
           />
         )}
         <div
           className="cloud-wrapper puppet"
           data-out-dir={STAGE_CONFIG.sky.cloud1.outDir}
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            top: 0,
-            left: 0,
-          }}
+          style={CLOUD_WRAPPER_STYLE}
         >
           <img
             src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
@@ -359,13 +399,7 @@ export default function Home() {
         <div
           className="cloud-wrapper puppet"
           data-out-dir={STAGE_CONFIG.sky.cloud2.outDir}
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            top: 0,
-            left: 0,
-          }}
+          style={CLOUD_WRAPPER_STYLE}
         >
           <img
             src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
@@ -383,6 +417,7 @@ export default function Home() {
       </div>
 
       <div className="ground">
+        <div className="ground-bg"></div>
         <img
           src={`${import.meta.env.BASE_URL}assets/Tree.png`}
           className="deco puppet"
@@ -418,6 +453,7 @@ export default function Home() {
             ...STAGE_CONFIG.sec1.windmill,
             backgroundColor: 'rgba(255,100,100,0.8)',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: '10px',
@@ -464,13 +500,14 @@ export default function Home() {
             ...STAGE_CONFIG.sec2.mailbox,
             backgroundColor: 'rgba(100,100,255,0.8)',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: '10px',
             cursor: 'pointer',
           }}
           data-out-dir={STAGE_CONFIG.sec2.mailbox.outDir}
-          onClick={() => setIsMailboxOpen(true)}
+          onClick={handleMailboxClick}
         >
           <h2>📬 우편함</h2>
         </div>
@@ -478,7 +515,7 @@ export default function Home() {
 
       <div className="panels-container">
         <section className="panel home-panel" style={{ opacity: 1 }}>
-          <div className="home-content">
+          <div className="home-content" style={STAGE_CONFIG.homeText}>
             <h1 className="creator-name">나의 이름</h1>
             <p className="creator-desc">
               간략한 설명 (예: 프론트엔드 개발자 포트폴리오)
@@ -538,7 +575,6 @@ export default function Home() {
         </section>
       </div>
 
-      {/* ⭐️ 가장 중요: 티켓이 있으면 처음부터 0px로 막고, 없으면 안 보이게 처리! */}
       <div
         className="iris-overlay"
         style={{
