@@ -14,7 +14,7 @@ import { getStageConfig } from './stageConfig';
 
 gsap.registerPlugin(Observer);
 
-// ⭐️ 리액트가 렌더링할 때마다 스타일을 덮어씌우는 걸 막기 위해 아예 밖에다 빼둔 고정 스타일
+// ⭐️ GSAP 조종용 부모 껍데기 스타일
 const CLOUD_WRAPPER_STYLE = {
   position: 'absolute',
   width: '100%',
@@ -41,10 +41,8 @@ export default function Home() {
   };
   const [deviceType, setDeviceType] = useState(getDeviceType());
 
-  // ⭐️ 리액트 방어 1: 기기가 바뀌지 않는 한 설정값을 재생성하지 않음 (GSAP 속성 보호)
   const STAGE_CONFIG = useMemo(() => getStageConfig(deviceType), [deviceType]);
 
-  // ⭐️ 리액트 방어 2: 태양 위치도 처음 한 번만 계산해서 영구 고정 (화면 깜빡임 원천 차단)
   const [timeData] = useState(() => {
     const hour = new Date().getHours();
     const isDay = hour >= 6 && hour < 19;
@@ -88,7 +86,7 @@ export default function Home() {
     if (isAnimatingRef.current) return;
     isAnimatingRef.current = true;
     gsap.to('.duck-container', {
-      x: '10vw',
+      x: STAGE_CONFIG.sec1.windmill.walkToX || '10vw',
       duration: 2.5,
       ease: 'power1.inOut',
       onComplete: () => {
@@ -113,7 +111,7 @@ export default function Home() {
     if (isAnimatingRef.current) return;
     isAnimatingRef.current = true;
     gsap.to('.duck-container', {
-      x: '10vw',
+      x: STAGE_CONFIG.sec2.mailbox.walkToX || '10vw',
       duration: 2.5,
       ease: 'power1.inOut',
       onComplete: () => {
@@ -161,44 +159,25 @@ export default function Home() {
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
-      const getPos = (el, isOut, targetSection) => {
-        const isDuck = el.classList.contains('duck-container');
-        const dir = el.dataset.outDir || 'bottom';
-        let inX = isDuck
-          ? STAGE_CONFIG.duck.positions[`sec${targetSection}`]?.x || '0vw'
-          : '0vw';
-        let inY = isDuck
-          ? STAGE_CONFIG.duck.positions[`sec${targetSection}`]?.y || '0vh'
-          : '0vh';
-
-        if (targetSection === 0 && !isDuck) isOut = true;
-
-        if (isOut) {
-          // ⭐️ 대각선 차단 1: 숨길 때는 X좌표를 절대 바꾸지 않고 오로지 Y(수직)로만 올리거나 내립니다!
-          return { x: inX, y: dir === 'top' ? '-250vh' : '250vh' };
-        }
-        return { x: inX, y: inY };
-      };
-
+      // ==========================================
+      // ⭐️ 1. 초기 세팅: 메인(섹션 1)에서는 오리만 빼고 다 숨김!
+      // ==========================================
       gsap.set('.project-panel, .contact-panel', { opacity: 0, autoAlpha: 0 });
       gsap.set('.sky-bg', { autoAlpha: 0 });
       gsap.set('.ground-bg', { y: '100%' });
 
-      // 처음 시작 시 완벽 세팅
-      gsap.utils.toArray('.puppet').forEach((el) => {
-        const isDuck = el.classList.contains('duck-container');
-        const pos = getPos(el, false, 0);
-        if (isDuck) {
-          gsap.set(el, {
-            x: pos.x,
-            y: pos.y,
-            scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
-            scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
-            opacity: 1,
-          });
-        } else {
-          gsap.set(el, { x: pos.x, y: pos.y, opacity: 1 });
-        }
+      // 하늘(해, 구름)은 하늘 위(-150vh)에 대기
+      gsap.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh', opacity: 1 });
+      // 땅 에셋(나무, 풍차 등)은 땅 밑(150vh)에 대기
+      gsap.set('.deco', { y: '150vh', opacity: 1 });
+
+      // 오리만 메인 화면 정위치에 세팅
+      gsap.set('.duck-container', {
+        x: STAGE_CONFIG.duck.positions.sec0.x,
+        y: STAGE_CONFIG.duck.positions.sec0.y,
+        scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
+        scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
+        opacity: 1,
       });
 
       const goToSection = (newIndex, isMenu = false, openContact = false) => {
@@ -226,19 +205,22 @@ export default function Home() {
             },
           });
 
-          // ⭐️ 대각선 차단 2: 나갈 때는 X 건드리지 말고 Y로만 "일직선"으로 떨어져라!
+          // ==========================================
+          // ⭐️ 2. 퇴장 모션: 무조건 전부 화면 밖으로 치워버림
+          // ==========================================
           tl.to(
-            '.puppet',
-            {
-              y: (i, el) => getPos(el, true, oldIndex).y,
-              duration: 0.8,
-              stagger: 0.05,
-              ease: 'back.in(1.2)',
-            },
+            '.duck-container, .deco',
+            { y: '150vh', duration: 0.8, stagger: 0.05, ease: 'back.in(1.2)' },
             0
-          ).to('.panel', { autoAlpha: 0, duration: 0.3 }, 0);
+          );
+          tl.to(
+            '.sun-wrapper, .cloud-wrapper',
+            { y: '-150vh', duration: 0.8, ease: 'back.in(1.2)' },
+            0
+          );
+          tl.to('.panel', { autoAlpha: 0, duration: 0.3 }, 0);
 
-          const enterTime = 0.8;
+          const enterTime = 1.5; // 모든 에셋이 완전히 퇴장할 때까지 기다리는 시간
 
           // 배경 전환
           if (newIndex === 0) {
@@ -255,7 +237,7 @@ export default function Home() {
             );
           }
 
-          // ⭐️ 대각선 차단 3: 화면 밖 바닥 밑에 숨어있을 때, 몰래 새로운 X 좌표로 "순간이동" 시킨다!
+          // 패널, 카메라 이동 세팅
           tl.set(`.panel`, { autoAlpha: 0 }, enterTime)
             .set(
               newIndex === 0
@@ -267,35 +249,81 @@ export default function Home() {
               enterTime
             )
             .set(
-              '.puppet',
+              '.ground',
+              { x: newIndex === 2 ? STAGE_CONFIG.groundOffset : '0vw' },
+              enterTime
+            );
+
+          // ==========================================
+          // ⭐️ 3. 등장 모션: 어디로 가느냐에 따라 갈림
+          // ==========================================
+          if (newIndex === 0) {
+            // [섹션 1 (메인 홈)으로 올 때]
+            tl.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh' }, enterTime); // 하늘 숨김 유지
+            tl.set('.deco', { y: '150vh' }, enterTime); // 땅 에셋 숨김 유지
+
+            // 오리만 밑에서 띠용! 하고 혼자 올라옴
+            tl.set(
+              '.duck-container',
               {
-                x: (i, el) => getPos(el, false, newIndex).x, // 몰래 x 이동!
-                y: (i, el) => getPos(el, true, newIndex).y, // 여전히 바닥(y)에 숨어있음
+                x: STAGE_CONFIG.duck.positions.sec0.x,
+                y: '150vh',
+                scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
+                scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
               },
               enterTime
-            )
-            .set(
+            );
+            tl.to(
               '.duck-container',
-              { scaleX: duckPos.scale, scaleY: duckPos.scale },
+              {
+                y: STAGE_CONFIG.duck.positions.sec0.y,
+                duration: 1,
+                ease: 'elastic.out(1, 0.5)',
+              },
               enterTime
-            )
-            .set('.ground', { x: newIndex === 2 ? STAGE_CONFIG.groundOffset : '0vw' }, enterTime)
+            );
+          } else {
+            // [섹션 2, 3 (풍차, 우편함)으로 갈 때]
+            // 하늘(해, 구름)이 위에서 띠용! 내려옴
+            tl.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh' }, enterTime);
+            tl.to(
+              '.sun-wrapper, .cloud-wrapper',
+              { y: '0vh', duration: 1, ease: 'elastic.out(1, 0.5)' },
+              enterTime
+            );
 
-          // ⭐️ 대각선 차단 4: 등장할 때는 X 건드리지 말고 Y로만 "일직선"으로 올라와라!
-          // 단, 메인 화면(0번)으로 올 때는 '오리'만 올라오고 다른 애들은 바닥에 가만히 숨어있어라!
-          const enterTargets = newIndex === 0 ? '.duck-container' : '.puppet';
-          tl.to(
-            enterTargets,
-            {
-              y: (i, el) => getPos(el, false, newIndex).y,
-              duration: 1,
-              stagger: 0.05,
-              ease: 'elastic.out(1, 0.5)',
-            },
-            enterTime
-          );
+            // 땅 에셋(나무, 풍차 등)이 밑에서 띠용! 올라옴
+            tl.set('.deco', { y: '150vh' }, enterTime);
+            tl.to(
+              '.deco',
+              {
+                y: '0vh',
+                duration: 1,
+                stagger: 0.05,
+                ease: 'elastic.out(1, 0.5)',
+              },
+              enterTime
+            );
+
+            // 오리는 화면 왼쪽 밖에서 터벅터벅 걸어 들어옴!
+            tl.set(
+              '.duck-container',
+              {
+                x: '-100vw',
+                y: duckPos.y,
+                scaleX: duckPos.scale,
+                scaleY: duckPos.scale,
+              },
+              enterTime
+            );
+            tl.to(
+              '.duck-container',
+              { x: duckPos.x, duration: 2.5, ease: 'power2.out' },
+              enterTime
+            );
+          }
         } else {
-          // 걷기 (카메라 패닝)
+          // 걷기 (섹션 2 ↔ 3 이동 시에는 하늘은 어차피 보여져 있으므로 냅둠)
           const tl = gsap.timeline({
             onComplete: () => {
               isAnimatingRef.current = false;
@@ -376,31 +404,26 @@ export default function Home() {
     <div className="home-container" ref={homeRef}>
       <div className="sky">
         <div className="sky-bg"></div>
+
         {timeData.isDay && (
-          <img
-            src={`${import.meta.env.BASE_URL}assets/Sun.png`}
-            alt="Sun"
-            className="sun puppet"
-            style={timeData.sunStyle}
-            data-out-dir={STAGE_CONFIG.sky.sun.outDir}
-          />
+          <div className="sun-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
+            <img
+              src={`${import.meta.env.BASE_URL}assets/Sun.png`}
+              alt="Sun"
+              className="sun"
+              style={timeData.sunStyle}
+            />
+          </div>
         )}
-        <div
-          className="cloud-wrapper puppet"
-          data-out-dir={STAGE_CONFIG.sky.cloud1.outDir}
-          style={CLOUD_WRAPPER_STYLE}
-        >
+
+        <div className="cloud-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
           <img
             src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
             alt="Cloud"
             className="cloud cloud1"
           />
         </div>
-        <div
-          className="cloud-wrapper puppet"
-          data-out-dir={STAGE_CONFIG.sky.cloud2.outDir}
-          style={CLOUD_WRAPPER_STYLE}
-        >
+        <div className="cloud-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
           <img
             src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
             alt="Cloud"
@@ -409,10 +432,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div
-        className="duck-container puppet"
-        data-out-dir={STAGE_CONFIG.duck.outDir}
-      >
+      <div className="duck-container puppet">
         <Duck />
       </div>
 
@@ -422,95 +442,87 @@ export default function Home() {
           src={`${import.meta.env.BASE_URL}assets/Tree.png`}
           className="deco puppet"
           style={STAGE_CONFIG.sec1.tree}
-          data-out-dir={STAGE_CONFIG.sec1.tree.outDir}
           alt=""
         />
         <img
           src={`${import.meta.env.BASE_URL}assets/Grass_1.png`}
           className="deco puppet"
           style={STAGE_CONFIG.sec1.grass1}
-          data-out-dir={STAGE_CONFIG.sec1.grass1.outDir}
           alt=""
         />
         <img
           src={`${import.meta.env.BASE_URL}assets/Grass_2.png`}
           className="deco puppet"
           style={STAGE_CONFIG.sec1.grass1_sub}
-          data-out-dir={STAGE_CONFIG.sec1.grass1_sub.outDir}
           alt=""
         />
         <img
           src={`${import.meta.env.BASE_URL}assets/Rock.png`}
           className="deco puppet"
           style={STAGE_CONFIG.sec1.rock}
-          data-out-dir={STAGE_CONFIG.sec1.rock.outDir}
           alt=""
         />
 
         <div
-          className="deco puppet windmill-placeholder"
-          style={{
-            ...STAGE_CONFIG.sec1.windmill,
-            backgroundColor: 'rgba(255,100,100,0.8)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '10px',
-            cursor: 'pointer',
-          }}
-          data-out-dir={STAGE_CONFIG.sec1.windmill.outDir}
+          className="deco puppet"
+          style={{ ...STAGE_CONFIG.sec1.windmill, cursor: 'pointer' }}
           onClick={handleWindmillClick}
         >
-          <h2>⚙️ 풍차</h2>
+          <img
+            src={`${import.meta.env.BASE_URL}assets/Windmill_body.png`}
+            alt="Windmill Body"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+            }}
+          />
+          <img
+            src={`${import.meta.env.BASE_URL}assets/Windmill_wing.png`}
+            alt="Windmill Wing"
+            className="windmill-wing"
+          />
         </div>
 
         <img
           src={`${import.meta.env.BASE_URL}assets/Tree.png`}
           className="deco puppet"
           style={STAGE_CONFIG.sec2.tree}
-          data-out-dir={STAGE_CONFIG.sec2.tree.outDir}
           alt=""
         />
         <img
           src={`${import.meta.env.BASE_URL}assets/Grass_2.png`}
           className="deco puppet"
           style={STAGE_CONFIG.sec2.grass2}
-          data-out-dir={STAGE_CONFIG.sec2.grass2.outDir}
           alt=""
         />
         <img
           src={`${import.meta.env.BASE_URL}assets/Grass_1.png`}
           className="deco puppet"
           style={STAGE_CONFIG.sec2.grass2_sub}
-          data-out-dir={STAGE_CONFIG.sec2.grass2_sub.outDir}
           alt=""
         />
         <img
           src={`${import.meta.env.BASE_URL}assets/Rock.png`}
           className="deco puppet"
           style={STAGE_CONFIG.sec2.rock}
-          data-out-dir={STAGE_CONFIG.sec2.rock.outDir}
           alt=""
         />
 
-        <div
-          className="deco puppet mailbox-placeholder"
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Mailbox.png`}
+          alt="Mailbox"
+          className="deco puppet"
           style={{
             ...STAGE_CONFIG.sec2.mailbox,
-            backgroundColor: 'rgba(100,100,255,0.8)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '10px',
+            objectFit: 'contain',
             cursor: 'pointer',
           }}
-          data-out-dir={STAGE_CONFIG.sec2.mailbox.outDir}
           onClick={handleMailboxClick}
-        >
-          <h2>📬 우편함</h2>
-        </div>
+        />
       </div>
 
       <div className="panels-container">

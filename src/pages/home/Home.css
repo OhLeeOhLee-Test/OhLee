@@ -165,3 +165,27 @@ body {
   z-index: 9999;
   pointer-events: none;
 }
+
+/* ⚙️ 풍차 날개 빙글빙글 애니메이션 */
+.windmill-wing {
+  position: absolute;
+  /* 🚨 중요: 날개의 중심(축)이 몸통의 어디에 꽂혀야 하는지 아래 top, left 비율을 조절해서 맞추세요! */
+  top: 30%;
+  left: 50%;
+  width: 130%; /* 보통 날개가 몸통보다 훨씬 큽니다. 크기를 조절하세요 */
+
+  /* 중심축을 날개 이미지의 한가운데로 설정 */
+  transform-origin: center center;
+  /* 8s: 8초에 한 바퀴 (더 빠르게 하려면 4s 등으로 줄이세요) */
+  animation: spinWing 8s linear infinite;
+}
+
+@keyframes spinWing {
+  /* translate(-50%, -50%)를 유지하면서 제자리 회전! */
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}

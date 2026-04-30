@@ -52,11 +52,12 @@ export const getStageConfig = (device) => {
 
       // ⚙️ 풍차
       windmill: {
-        left: device === 'mobile' ? '80vw' : '60vw',
+        left: '60vw',
         width: `${200 * scale}px`,
         height: `${400 * scale}px`,
         zIndex: 10,
         outDir: 'bottom',
+        walkToX: device === 'mobile' ? '5vw' : '10vw',
       },
     },
 
@@ -68,11 +69,12 @@ export const getStageConfig = (device) => {
 
       // 📬 우편함 (PC는 화면 1개 반 거리, 모바일은 화면이 작으니 살짝 가깝게)
       mailbox: {
-        left: device === 'mobile' ? '120vw' : '270vw',
+        left: '280vw',
         width: `${150 * scale}px`,
         height: `${300 * scale}px`,
         zIndex: 10,
         outDir: 'bottom',
+        walkToX: device === 'mobile' ? '5vw' : '30vw',
       },
       rock: { left: '170vw', width: `${120 * scale}px`, outDir: 'bottom' },
     },
