@@ -59,8 +59,6 @@ export default function Home() {
   const navigate = useNavigate();
   const currentIndexRef = useRef(0);
   const isAnimatingRef = useRef(false);
-
-  // ⭐️ [핵심 추가] 오리가 마지막으로 도착한 곳을 기억하는 뇌!
   const lastInteractionRef = useRef(null);
 
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
@@ -81,7 +79,6 @@ export default function Home() {
     const hour = new Date().getHours();
     const isDay = hour >= 6 && hour < 19;
     const progress = isDay ? (hour - 6) / 13 : 0;
-
     const baseY = STAGE_CONFIG.sky.sun.baseY || 40;
     const amplitude = STAGE_CONFIG.sky.sun.amplitude || 30;
 
@@ -184,17 +181,13 @@ export default function Home() {
 
   const handleWindmillClick = () => {
     if (isAnimatingRef.current) return;
-
-    // ⭐️ 기억 체크: 이미 풍차 앞이라면 걷지 말고 바로 아이리스 실행!
     if (lastInteractionRef.current === 'windmill') {
       sessionStorage.setItem('playIris', 'true');
       triggerIrisTransition(false, () => navigate('/projects/Projects'));
       return;
     }
-
     isAnimatingRef.current = true;
-    lastInteractionRef.current = 'windmill'; // 방금 풍차로 갔다고 기억에 저장
-
+    lastInteractionRef.current = 'windmill';
     playSyncWalk(2.5, 'power1.inOut', 8);
     gsap.to('.duck-container', {
       left: STAGE_CONFIG.sec1.windmill.walkToLeft || '10vw',
@@ -209,16 +202,12 @@ export default function Home() {
 
   const handleMailboxClick = () => {
     if (isAnimatingRef.current) return;
-
-    // ⭐️ 기억 체크: 이미 우편함 앞이라면 걷지 말고 모달창 바로 열기!
     if (lastInteractionRef.current === 'mailbox') {
       setIsMailboxOpen(true);
       return;
     }
-
     isAnimatingRef.current = true;
-    lastInteractionRef.current = 'mailbox'; // 방금 우편함으로 갔다고 기억에 저장
-
+    lastInteractionRef.current = 'mailbox';
     playSyncWalk(2.5, 'power1.inOut', 8);
     gsap.to('.duck-container', {
       left: STAGE_CONFIG.sec2.mailbox.walkToLeft || '10vw',
@@ -241,9 +230,7 @@ export default function Home() {
   useLayoutEffect(() => {
     if (shouldPlayIris) {
       sessionStorage.removeItem('playIris');
-      setTimeout(() => {
-        triggerIrisTransition(true);
-      }, 100);
+      setTimeout(() => triggerIrisTransition(true), 100);
     }
   }, [shouldPlayIris]);
 
@@ -254,6 +241,7 @@ export default function Home() {
       gsap.set('.ground-bg', { y: '100%' });
       gsap.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh', opacity: 1 });
 
+      // ⭐️ 모든 소품의 기준점을 정중앙(xPercent: -50) 바닥으로 완벽 통일!
       gsap.set('.deco', {
         y: '150vh',
         opacity: 1,
@@ -261,6 +249,7 @@ export default function Home() {
         transformOrigin: 'bottom center',
       });
 
+      // ⭐️ 오리의 기준점도 완벽 통일 및 뚝배기(top) 끄기!
       gsap.set('.duck-container', {
         top: 'auto',
         left: STAGE_CONFIG.duck.positions.sec0.left,
@@ -277,8 +266,6 @@ export default function Home() {
       const goToSection = (newIndex, isMenu = false, openContact = false) => {
         if (isAnimatingRef.current) return;
         isAnimatingRef.current = true;
-
-        // ⭐️ 다른 무대로 이동하면 오리의 기억(도착지)을 깔끔하게 지워줍니다!
         lastInteractionRef.current = null;
 
         const oldIndex = currentIndexRef.current;
@@ -350,7 +337,6 @@ export default function Home() {
           if (newIndex === 0) {
             tl.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh' }, enterTime);
             tl.set('.deco', { y: '150vh' }, enterTime);
-
             tl.set(
               '.duck-container',
               {
@@ -374,7 +360,6 @@ export default function Home() {
               { y: '0vh', duration: 1, ease: 'elastic.out(1, 0.5)' },
               enterTime
             );
-
             tl.set('.deco', { y: '150vh' }, enterTime);
             tl.to(
               '.deco',
@@ -386,7 +371,6 @@ export default function Home() {
               },
               enterTime
             );
-
             tl.set(
               '.duck-container',
               {
@@ -459,10 +443,8 @@ export default function Home() {
         preventDefault: false,
         onChangeY: (self) => {
           if (isAnimatingRef.current) return;
-          const isTouch =
-            self.event.type.includes('touch') ||
-            self.event.type.includes('pointer');
-          const delta = isTouch ? -self.deltaY : self.deltaY;
+          // ⭐️ 모바일 스크롤 & PC 마우스 휠 방향 완벽 통일! (-) 적용!
+          const delta = -self.deltaY;
 
           if (delta > 0 && currentIndexRef.current < 2)
             goToSection(currentIndexRef.current + 1);
@@ -672,7 +654,6 @@ export default function Home() {
           )}
         </section>
       </div>
-
       <div
         className="iris-overlay"
         style={{ display: shouldPlayIris ? 'block' : 'none' }}
