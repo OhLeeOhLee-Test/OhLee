@@ -130,7 +130,7 @@ export const getStageConfig = (device) => {
         zIndex: 10,
         outDir: 'bottom',
         // ⭐️ 오리가 움직일 목표 좌표 (walkToX -> walkToLeft)
-        walkToLeft: device === 'mobile' ? '145vw' : '30vw',
+        walkToLeft: device === 'mobile' ? '35vw' : '30vw',
       },
     },
   };
