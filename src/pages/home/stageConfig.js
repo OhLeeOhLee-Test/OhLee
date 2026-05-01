@@ -14,17 +14,17 @@ export const getStageConfig = (device) => {
       positions: {
         sec0: {
           left: device === 'mobile' ? '95vw' : '90vw',
-          bottom: device === 'mobile' ? '-55vh' : '-125vh',
+          bottom: device === 'mobile' ? '0vh' : '-125vh',
           scale: device === 'mobile' ? 3 : 1.5,
         },
         sec1: {
           left: device === 'mobile' ? '15vw' : '15vw',
-          bottom: device === 'mobile' ? '-5vh' : '-50vh',
+          bottom: device === 'mobile' ? '15vh' : '-50vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
         sec2: {
           left: device === 'mobile' ? '15vw' : '-35vw',
-          bottom: device === 'mobile' ? '-5vh' : '0vh',
+          bottom: device === 'mobile' ? '15vh' : '0vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
       },
