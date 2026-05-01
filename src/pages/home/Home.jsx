@@ -24,23 +24,44 @@ const CLOUD_WRAPPER_STYLE = {
 };
 
 const contactStyles = {
-  card: { backgroundColor: '#fff', padding: '40px', borderRadius: '20px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', width: '350px', textAlign: 'center' },
+  card: {
+    backgroundColor: '#fff',
+    padding: '40px',
+    borderRadius: '20px',
+    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+    width: '350px',
+    textAlign: 'center',
+  },
   form: { display: 'flex', flexDirection: 'column', gap: '15px' },
   input: { padding: '12px', border: '1px solid #ddd', borderRadius: '8px' },
-  textarea: { padding: '12px', border: '1px solid #ddd', borderRadius: '8px', height: '80px', resize: 'none' },
-  button: { padding: '12px', backgroundColor: '#111', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' },
+  textarea: {
+    padding: '12px',
+    border: '1px solid #ddd',
+    borderRadius: '8px',
+    height: '80px',
+    resize: 'none',
+  },
+  button: {
+    padding: '12px',
+    backgroundColor: '#111',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+  },
 };
 
 export default function Home() {
   const homeRef = useRef();
-  const contactCardRef = useRef(); 
-  
+  const contactCardRef = useRef();
+
   const navigate = useNavigate();
   const currentIndexRef = useRef(0);
   const isAnimatingRef = useRef(false);
-  
+
   // ⭐️ [핵심 추가] 오리가 마지막으로 도착한 곳을 기억하는 뇌!
-  const lastInteractionRef = useRef(null); 
+  const lastInteractionRef = useRef(null);
 
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
   const [shouldPlayIris] = useState(
@@ -60,7 +81,7 @@ export default function Home() {
     const hour = new Date().getHours();
     const isDay = hour >= 6 && hour < 19;
     const progress = isDay ? (hour - 6) / 13 : 0;
-    
+
     const baseY = STAGE_CONFIG.sky.sun.baseY || 40;
     const amplitude = STAGE_CONFIG.sky.sun.amplitude || 30;
 
@@ -101,18 +122,18 @@ export default function Home() {
   }, [isMailboxOpen]);
 
   const playSyncWalk = (duration, easeCurve, steps = 16) => {
-    const proxy = { p: 0 }; 
-    gsap.killTweensOf('.duck-sprite', 'y'); 
+    const proxy = { p: 0 };
+    gsap.killTweensOf('.duck-sprite', 'y');
 
     gsap.to(proxy, {
       p: 1,
       duration: duration,
-      ease: easeCurve, 
+      ease: easeCurve,
       onUpdate: () => {
         const bounce = Math.abs(Math.sin(proxy.p * Math.PI * steps)) * -15;
         gsap.set('.duck-sprite', { y: bounce });
       },
-      onComplete: () => gsap.set('.duck-sprite', { y: 0 })
+      onComplete: () => gsap.set('.duck-sprite', { y: 0 }),
     });
   };
 
@@ -132,7 +153,8 @@ export default function Home() {
     const startSize = isEntering ? '0px' : '300vmax';
     const endSize = isEntering ? '300vmax' : '0px';
 
-    gsap.fromTo('.iris-overlay',
+    gsap.fromTo(
+      '.iris-overlay',
       {
         display: 'block',
         position: 'fixed',
@@ -155,14 +177,14 @@ export default function Home() {
         onComplete: () => {
           if (isEntering) gsap.set('.iris-overlay', { display: 'none' });
           if (onCompleteCallback) onCompleteCallback();
-        }
+        },
       }
     );
   };
 
   const handleWindmillClick = () => {
     if (isAnimatingRef.current) return;
-    
+
     // ⭐️ 기억 체크: 이미 풍차 앞이라면 걷지 말고 바로 아이리스 실행!
     if (lastInteractionRef.current === 'windmill') {
       sessionStorage.setItem('playIris', 'true');
@@ -172,8 +194,8 @@ export default function Home() {
 
     isAnimatingRef.current = true;
     lastInteractionRef.current = 'windmill'; // 방금 풍차로 갔다고 기억에 저장
-    
-    playSyncWalk(2.5, 'power1.inOut', 8); 
+
+    playSyncWalk(2.5, 'power1.inOut', 8);
     gsap.to('.duck-container', {
       left: STAGE_CONFIG.sec1.windmill.walkToLeft || '10vw',
       duration: 2.5,
@@ -187,7 +209,7 @@ export default function Home() {
 
   const handleMailboxClick = () => {
     if (isAnimatingRef.current) return;
-    
+
     // ⭐️ 기억 체크: 이미 우편함 앞이라면 걷지 말고 모달창 바로 열기!
     if (lastInteractionRef.current === 'mailbox') {
       setIsMailboxOpen(true);
@@ -196,7 +218,7 @@ export default function Home() {
 
     isAnimatingRef.current = true;
     lastInteractionRef.current = 'mailbox'; // 방금 우편함으로 갔다고 기억에 저장
-    
+
     playSyncWalk(2.5, 'power1.inOut', 8);
     gsap.to('.duck-container', {
       left: STAGE_CONFIG.sec2.mailbox.walkToLeft || '10vw',
@@ -221,27 +243,26 @@ export default function Home() {
       sessionStorage.removeItem('playIris');
       setTimeout(() => {
         triggerIrisTransition(true);
-      }, 100); 
+      }, 100);
     }
   }, [shouldPlayIris]);
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
-      
       gsap.set('.project-panel, .contact-panel', { opacity: 0, autoAlpha: 0 });
       gsap.set('.sky-bg', { autoAlpha: 0 });
       gsap.set('.ground-bg', { y: '100%' });
       gsap.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh', opacity: 1 });
-      
-      gsap.set('.deco', { 
-        y: '150vh', 
+
+      gsap.set('.deco', {
+        y: '150vh',
         opacity: 1,
         xPercent: -50,
-        transformOrigin: 'bottom center'
+        transformOrigin: 'bottom center',
       });
-      
+
       gsap.set('.duck-container', {
-        top: 'auto', 
+        top: 'auto',
         left: STAGE_CONFIG.duck.positions.sec0.left,
         bottom: STAGE_CONFIG.duck.positions.sec0.bottom,
         xPercent: -50,
@@ -249,14 +270,14 @@ export default function Home() {
         scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
         transformOrigin: 'bottom center',
         opacity: 1,
-        x: 0, 
+        x: 0,
         y: 0,
       });
 
       const goToSection = (newIndex, isMenu = false, openContact = false) => {
         if (isAnimatingRef.current) return;
         isAnimatingRef.current = true;
-        
+
         // ⭐️ 다른 무대로 이동하면 오리의 기억(도착지)을 깔끔하게 지워줍니다!
         lastInteractionRef.current = null;
 
@@ -282,76 +303,152 @@ export default function Home() {
             },
           });
 
-          tl.to('.duck-container, .deco', { y: '150vh', duration: 0.8, stagger: 0.05, ease: 'back.in(1.2)' }, 0);
-          tl.to('.sun-wrapper, .cloud-wrapper', { y: '-150vh', duration: 0.8, ease: 'back.in(1.2)' }, 0);
+          tl.to(
+            '.duck-container, .deco',
+            { y: '150vh', duration: 0.8, stagger: 0.05, ease: 'back.in(1.2)' },
+            0
+          );
+          tl.to(
+            '.sun-wrapper, .cloud-wrapper',
+            { y: '-150vh', duration: 0.8, ease: 'back.in(1.2)' },
+            0
+          );
           tl.to('.panel', { autoAlpha: 0, duration: 0.3 }, 0);
 
           const enterTime = 1.5;
 
           if (newIndex === 0) {
-            tl.to('.sky-bg', { autoAlpha: 0, duration: 0.8 }, enterTime)
-              .to('.ground-bg', { y: '100%', duration: 0.8, ease: 'power2.in' }, enterTime);
+            tl.to('.sky-bg', { autoAlpha: 0, duration: 0.8 }, enterTime).to(
+              '.ground-bg',
+              { y: '100%', duration: 0.8, ease: 'power2.in' },
+              enterTime
+            );
           } else {
-            tl.to('.sky-bg', { autoAlpha: 1, duration: 1 }, enterTime)
-              .to('.ground-bg', { y: '0%', duration: 1, ease: 'power2.out' }, enterTime);
+            tl.to('.sky-bg', { autoAlpha: 1, duration: 1 }, enterTime).to(
+              '.ground-bg',
+              { y: '0%', duration: 1, ease: 'power2.out' },
+              enterTime
+            );
           }
 
           tl.set(`.panel`, { autoAlpha: 0 }, enterTime)
-            .set(newIndex === 0 ? '.home-panel' : newIndex === 1 ? '.project-panel' : '.contact-panel', { autoAlpha: 1 }, enterTime)
-            .set('.ground', { x: newIndex === 2 ? STAGE_CONFIG.groundOffset : '0vw' }, enterTime);
+            .set(
+              newIndex === 0
+                ? '.home-panel'
+                : newIndex === 1
+                ? '.project-panel'
+                : '.contact-panel',
+              { autoAlpha: 1 },
+              enterTime
+            )
+            .set(
+              '.ground',
+              { x: newIndex === 2 ? STAGE_CONFIG.groundOffset : '0vw' },
+              enterTime
+            );
 
           if (newIndex === 0) {
-            tl.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh' }, enterTime); 
-            tl.set('.deco', { y: '150vh' }, enterTime); 
-            
-            tl.set('.duck-container', {
-              left: STAGE_CONFIG.duck.positions.sec0.left,
-              bottom: STAGE_CONFIG.duck.positions.sec0.bottom,
-              y: '150vh', 
-              scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
-              scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
-            }, enterTime);
-            tl.to('.duck-container', { y: 0, duration: 1, ease: 'elastic.out(1, 0.5)' }, enterTime);
+            tl.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh' }, enterTime);
+            tl.set('.deco', { y: '150vh' }, enterTime);
 
+            tl.set(
+              '.duck-container',
+              {
+                left: STAGE_CONFIG.duck.positions.sec0.left,
+                bottom: STAGE_CONFIG.duck.positions.sec0.bottom,
+                y: '150vh',
+                scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
+                scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
+              },
+              enterTime
+            );
+            tl.to(
+              '.duck-container',
+              { y: 0, duration: 1, ease: 'elastic.out(1, 0.5)' },
+              enterTime
+            );
           } else {
             tl.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh' }, enterTime);
-            tl.to('.sun-wrapper, .cloud-wrapper', { y: '0vh', duration: 1, ease: 'elastic.out(1, 0.5)' }, enterTime);
+            tl.to(
+              '.sun-wrapper, .cloud-wrapper',
+              { y: '0vh', duration: 1, ease: 'elastic.out(1, 0.5)' },
+              enterTime
+            );
 
             tl.set('.deco', { y: '150vh' }, enterTime);
-            tl.to('.deco', { y: '0vh', duration: 1, stagger: 0.05, ease: 'elastic.out(1, 0.5)' }, enterTime);
+            tl.to(
+              '.deco',
+              {
+                y: '0vh',
+                duration: 1,
+                stagger: 0.05,
+                ease: 'elastic.out(1, 0.5)',
+              },
+              enterTime
+            );
 
-            tl.set('.duck-container', { 
-              left: '-50vw', 
-              bottom: duckPos.bottom, 
-              y: 0,
-              scaleX: duckPos.scale, 
-              scaleY: duckPos.scale 
-            }, enterTime);
-            
+            tl.set(
+              '.duck-container',
+              {
+                left: '-50vw',
+                bottom: duckPos.bottom,
+                y: 0,
+                scaleX: duckPos.scale,
+                scaleY: duckPos.scale,
+              },
+              enterTime
+            );
+
             tl.add(() => playSyncWalk(2.5, 'power2.out', 10), enterTime);
-            tl.to('.duck-container', { left: duckPos.left, duration: 2.5, ease: 'power2.out' }, enterTime);
+            tl.to(
+              '.duck-container',
+              { left: duckPos.left, duration: 2.5, ease: 'power2.out' },
+              enterTime
+            );
           }
         } else {
-          const tl = gsap.timeline({ 
+          const tl = gsap.timeline({
             onComplete: () => {
-              isAnimatingRef.current = false; 
-            } 
+              isAnimatingRef.current = false;
+            },
           });
           const xMove = newIndex === 2 ? STAGE_CONFIG.groundOffset : '0vw';
 
-          tl.to('.duck-container', { scaleX: targetScaleX, scaleY: duckPos.scale })
+          tl.to('.duck-container', {
+            scaleX: targetScaleX,
+            scaleY: duckPos.scale,
+          })
             .add(() => playSyncWalk(2, 'power2.inOut', 10), 'walk')
-            .to('.ground', { x: xMove, duration: 2, ease: 'power2.inOut' }, 'walk')
-            .to('.duck-container', { 
-              left: duckPos.left, 
-              bottom: duckPos.bottom, 
-              duration: 2, 
-              ease: 'power2.inOut' 
-            }, 'walk')
-            .to('.duck-container', { scaleX: duckPos.scale, duration: 0.3, ease: 'power1.inOut' });
+            .to(
+              '.ground',
+              { x: xMove, duration: 2, ease: 'power2.inOut' },
+              'walk'
+            )
+            .to(
+              '.duck-container',
+              {
+                left: duckPos.left,
+                bottom: duckPos.bottom,
+                duration: 2,
+                ease: 'power2.inOut',
+              },
+              'walk'
+            )
+            .to('.duck-container', {
+              scaleX: duckPos.scale,
+              duration: 0.3,
+              ease: 'power1.inOut',
+            });
 
-          gsap.to(oldIndex === 1 ? '.project-panel' : '.contact-panel', { autoAlpha: 0, duration: 0.5 });
-          gsap.to(newIndex === 1 ? '.project-panel' : '.contact-panel', { autoAlpha: 1, duration: 0.5, delay: 0.5 });
+          gsap.to(oldIndex === 1 ? '.project-panel' : '.contact-panel', {
+            autoAlpha: 0,
+            duration: 0.5,
+          });
+          gsap.to(newIndex === 1 ? '.project-panel' : '.contact-panel', {
+            autoAlpha: 1,
+            duration: 0.5,
+            delay: 0.5,
+          });
         }
       };
 
@@ -362,18 +459,23 @@ export default function Home() {
         preventDefault: false,
         onChangeY: (self) => {
           if (isAnimatingRef.current) return;
-          const isTouch = self.event.type.includes('touch') || self.event.type.includes('pointer');
-          const delta = isTouch ? -self.deltaY : self.deltaY; 
+          const isTouch =
+            self.event.type.includes('touch') ||
+            self.event.type.includes('pointer');
+          const delta = isTouch ? -self.deltaY : self.deltaY;
 
-          if (delta > 0 && currentIndexRef.current < 2) goToSection(currentIndexRef.current + 1);
-          else if (delta < 0 && currentIndexRef.current > 0) goToSection(currentIndexRef.current - 1);
+          if (delta > 0 && currentIndexRef.current < 2)
+            goToSection(currentIndexRef.current + 1);
+          else if (delta < 0 && currentIndexRef.current > 0)
+            goToSection(currentIndexRef.current - 1);
         },
       });
 
       const handleNavSignal = (e) => {
         const target = e.detail;
         if (target === 1) handleHeaderProjectsClick();
-        else if (currentIndexRef.current !== target) goToSection(target, true, target === 2);
+        else if (currentIndexRef.current !== target)
+          goToSection(target, true, target === 2);
         else if (target === 2) setIsMailboxOpen(true);
       };
 
@@ -389,14 +491,29 @@ export default function Home() {
         <div className="sky-bg"></div>
         {timeData.isDay && (
           <div className="sun-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
-            <img src={`${import.meta.env.BASE_URL}assets/Sun.png`} alt="Sun" className="sun" style={{ ...timeData.sunStyle, ...STAGE_CONFIG.sky.sun }} />
+            <img
+              src={`${import.meta.env.BASE_URL}assets/Sun.png`}
+              alt="Sun"
+              className="sun"
+              style={{ ...timeData.sunStyle, ...STAGE_CONFIG.sky.sun }}
+            />
           </div>
         )}
         <div className="cloud-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
-          <img src={`${import.meta.env.BASE_URL}assets/Cloud.png`} alt="Cloud" className="cloud cloud1" style={STAGE_CONFIG.sky.cloud1} />
+          <img
+            src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
+            alt="Cloud"
+            className="cloud cloud1"
+            style={STAGE_CONFIG.sky.cloud1}
+          />
         </div>
         <div className="cloud-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
-          <img src={`${import.meta.env.BASE_URL}assets/Cloud.png`} alt="Cloud" className="cloud cloud2" style={STAGE_CONFIG.sky.cloud2} />
+          <img
+            src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
+            alt="Cloud"
+            className="cloud cloud2"
+            style={STAGE_CONFIG.sky.cloud2}
+          />
         </div>
       </div>
 
@@ -406,49 +523,160 @@ export default function Home() {
 
       <div className="ground">
         <div className="ground-bg"></div>
-        <img src={`${import.meta.env.BASE_URL}assets/Tree.png`} className="deco puppet" style={STAGE_CONFIG.sec1.tree} alt="" />
-        <img src={`${import.meta.env.BASE_URL}assets/Grass_1.png`} className="deco puppet" style={STAGE_CONFIG.sec1.grass1} alt="" />
-        <img src={`${import.meta.env.BASE_URL}assets/Grass_2.png`} className="deco puppet" style={STAGE_CONFIG.sec1.grass1_sub} alt="" />
-        <img src={`${import.meta.env.BASE_URL}assets/Rock.png`} className="deco puppet" style={STAGE_CONFIG.sec1.rock} alt="" />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Tree.png`}
+          className="deco puppet"
+          style={STAGE_CONFIG.sec1.tree}
+          alt=""
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Grass_1.png`}
+          className="deco puppet"
+          style={STAGE_CONFIG.sec1.grass1}
+          alt=""
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Grass_2.png`}
+          className="deco puppet"
+          style={STAGE_CONFIG.sec1.grass1_sub}
+          alt=""
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Rock.png`}
+          className="deco puppet"
+          style={STAGE_CONFIG.sec1.rock}
+          alt=""
+        />
 
-        <div className="deco puppet" style={{ ...STAGE_CONFIG.sec1.windmill, cursor: 'pointer' }} onClick={handleWindmillClick}>
-          <img src={`${import.meta.env.BASE_URL}assets/Windmill_body.png`} alt="Windmill Body" style={{ width: '100%', height: '100%', objectFit: 'contain', position: 'absolute', bottom: 0, left: 0 }} />
-          <img src={`${import.meta.env.BASE_URL}assets/Windmill_wing.png`} alt="Windmill Wing" className="windmill-wing" />
+        <div
+          className="deco puppet"
+          style={{ ...STAGE_CONFIG.sec1.windmill, cursor: 'pointer' }}
+          onClick={handleWindmillClick}
+        >
+          <img
+            src={`${import.meta.env.BASE_URL}assets/Windmill_body.png`}
+            alt="Windmill Body"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+            }}
+          />
+          <img
+            src={`${import.meta.env.BASE_URL}assets/Windmill_wing.png`}
+            alt="Windmill Wing"
+            className="windmill-wing"
+          />
         </div>
 
-        <img src={`${import.meta.env.BASE_URL}assets/Tree.png`} className="deco puppet" style={STAGE_CONFIG.sec2.tree} alt="" />
-        <img src={`${import.meta.env.BASE_URL}assets/Grass_2.png`} className="deco puppet" style={STAGE_CONFIG.sec2.grass2} alt="" />
-        <img src={`${import.meta.env.BASE_URL}assets/Grass_1.png`} className="deco puppet" style={STAGE_CONFIG.sec2.grass2_sub} alt="" />
-        <img src={`${import.meta.env.BASE_URL}assets/Rock.png`} className="deco puppet" style={STAGE_CONFIG.sec2.rock} alt="" />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Tree.png`}
+          className="deco puppet"
+          style={STAGE_CONFIG.sec2.tree}
+          alt=""
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Grass_2.png`}
+          className="deco puppet"
+          style={STAGE_CONFIG.sec2.grass2}
+          alt=""
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Grass_1.png`}
+          className="deco puppet"
+          style={STAGE_CONFIG.sec2.grass2_sub}
+          alt=""
+        />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Rock.png`}
+          className="deco puppet"
+          style={STAGE_CONFIG.sec2.rock}
+          alt=""
+        />
 
-        <img src={`${import.meta.env.BASE_URL}assets/Mailbox.png`} alt="Mailbox" className="deco puppet" style={{ ...STAGE_CONFIG.sec2.mailbox, objectFit: 'contain', cursor: 'pointer' }} onClick={handleMailboxClick} />
+        <img
+          src={`${import.meta.env.BASE_URL}assets/Mailbox.png`}
+          alt="Mailbox"
+          className="deco puppet"
+          style={{
+            ...STAGE_CONFIG.sec2.mailbox,
+            objectFit: 'contain',
+            cursor: 'pointer',
+          }}
+          onClick={handleMailboxClick}
+        />
       </div>
 
       <div className="panels-container">
         <section className="panel home-panel" style={{ opacity: 1 }}>
           <div className="home-content" style={STAGE_CONFIG.homeText}>
             <h1 className="creator-name">나의 이름</h1>
-            <p className="creator-desc">간략한 설명 (예: 프론트엔드 개발자 포트폴리오)</p>
+            <p className="creator-desc">
+              간략한 설명 (예: 프론트엔드 개발자 포트폴리오)
+            </p>
           </div>
         </section>
         <section className="panel project-panel"></section>
-        <section className="panel contact-panel" style={{ pointerEvents: 'none' }}>
+        <section
+          className="panel contact-panel"
+          style={{ pointerEvents: 'none' }}
+        >
           {isMailboxOpen && (
-            <div ref={contactCardRef} className="contact-card" style={{ ...contactStyles.card, pointerEvents: 'auto', position: 'relative' }}>
-              <button onClick={() => setIsMailboxOpen(false)} style={{ position: 'absolute', top: '15px', right: '15px', cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.2rem' }}>❌</button>
+            <div
+              ref={contactCardRef}
+              className="contact-card"
+              style={{
+                ...contactStyles.card,
+                pointerEvents: 'auto',
+                position: 'relative',
+              }}
+            >
+              <button
+                onClick={() => setIsMailboxOpen(false)}
+                style={{
+                  position: 'absolute',
+                  top: '15px',
+                  right: '15px',
+                  cursor: 'pointer',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.2rem',
+                }}
+              >
+                ❌
+              </button>
               <h2>Contact Me</h2>
               <form style={contactStyles.form}>
-                <input type="text" placeholder="성함" style={contactStyles.input} />
-                <input type="email" placeholder="이메일" style={contactStyles.input} />
-                <textarea placeholder="메시지" style={contactStyles.textarea}></textarea>
-                <button type="button" style={contactStyles.button}>보내기</button>
+                <input
+                  type="text"
+                  placeholder="성함"
+                  style={contactStyles.input}
+                />
+                <input
+                  type="email"
+                  placeholder="이메일"
+                  style={contactStyles.input}
+                />
+                <textarea
+                  placeholder="메시지"
+                  style={contactStyles.textarea}
+                ></textarea>
+                <button type="button" style={contactStyles.button}>
+                  보내기
+                </button>
               </form>
             </div>
           )}
         </section>
       </div>
 
-      <div className="iris-overlay" style={{ display: shouldPlayIris ? 'block' : 'none' }}></div>
+      <div
+        className="iris-overlay"
+        style={{ display: shouldPlayIris ? 'block' : 'none' }}
+      ></div>
     </div>
   );
 }
