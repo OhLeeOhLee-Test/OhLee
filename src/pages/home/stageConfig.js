@@ -96,8 +96,8 @@ export const getStageConfig = (device) => {
     // 🌍 2번 무대 (우편함 및 주변 환경)
     sec2: {
       tree: {
-        left: device === 'mobile' ? '220vw' : '90vw',
-        bottom: device === 'mobile' ? '15vh' : '0vh',
+        left: device === 'mobile' ? '225vw' : '90vw',
+        bottom: device === 'mobile' ? '18vh' : '0vh',
         width: device === 'mobile' ? '200px' : '250px',
         outDir: 'bottom',
       },
