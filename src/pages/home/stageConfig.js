@@ -82,7 +82,7 @@ export const getStageConfig = (device) => {
 
       // ⚙️ 풍차
       windmill: {
-        left: device === 'mobile' ? '40vw' : '50vw',
+        left: device === 'mobile' ? '70vw' : '50vw',
         bottom: device === 'mobile' ? '-15vh' : '2vh',
         width: device === 'mobile' ? '480px' : '200px',
         height: device === 'mobile' ? '960px' : '400px',
@@ -122,7 +122,7 @@ export const getStageConfig = (device) => {
 
       // 📬 우편함
       mailbox: {
-        left: device === 'mobile' ? '130vw' : '280vw',
+        left: device === 'mobile' ? '200vw' : '280vw',
         bottom: device === 'mobile' ? '-42vh' : '0vh',
         width: device === 'mobile' ? '750px' : '150px',
         // ⭐️ 원상복구! 감독님이 세팅하신 height를 다시 살렸습니다.
