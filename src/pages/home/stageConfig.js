@@ -82,8 +82,8 @@ export const getStageConfig = (device) => {
 
       // ⚙️ 풍차
       windmill: {
-        left: device === 'mobile' ? '45vw' : '50vw',
-        bottom: device === 'mobile' ? '-12vh' : '2vh',
+        left: device === 'mobile' ? '40vw' : '50vw',
+        bottom: device === 'mobile' ? '-15vh' : '2vh',
         width: device === 'mobile' ? '480px' : '200px',
         height: device === 'mobile' ? '960px' : '400px',
         zIndex: 10,
