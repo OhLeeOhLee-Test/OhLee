@@ -82,7 +82,7 @@ export const getStageConfig = (device) => {
 
       // ⚙️ 풍차
       windmill: {
-        left: device === 'mobile' ? '70vw' : '50vw',
+        left: device === 'mobile' ? '80vw' : '50vw',
         bottom: device === 'mobile' ? '-15vh' : '2vh',
         width: device === 'mobile' ? '480px' : '200px',
         height: device === 'mobile' ? '960px' : '400px',
@@ -96,9 +96,9 @@ export const getStageConfig = (device) => {
     // 🌍 2번 무대 (우편함 및 주변 환경)
     sec2: {
       tree: {
-        left: device === 'mobile' ? '200vw' : '90vw',
-        bottom: device === 'mobile' ? '12vh' : '0vh',
-        width: device === 'mobile' ? '150px' : '250px',
+        left: device === 'mobile' ? '250vw' : '90vw',
+        bottom: device === 'mobile' ? '15vh' : '0vh',
+        width: device === 'mobile' ? '200px' : '250px',
         outDir: 'bottom',
       },
       grass2: {
