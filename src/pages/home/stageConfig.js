@@ -81,7 +81,7 @@ export const getStageConfig = (device) => {
 
       windmill: {
         left: device === 'mobile' ? '80vw' : '50vw',
-        bottom: device === 'mobile' ? '0vh' : '2vh',
+        bottom: device === 'mobile' ? '-5vh' : '2vh',
         // ⭐️ 480px, 960px의 거대한 픽셀을 비율에 맞게 vw로 변환! (1:2 비율 완벽 유지)
         width: device === 'mobile' ? '60vw' : '200px',
         height: device === 'mobile' ? '120vw' : '400px',
