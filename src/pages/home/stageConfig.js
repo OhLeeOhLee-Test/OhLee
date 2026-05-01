@@ -26,7 +26,7 @@ export const getStageConfig = (device) => {
         sec2: {
           left: device === 'mobile' ? '15vw' : '-35vw',
           // ⭐️ 우편함(12vw) 바로 앞의 땅을 밟도록 오리를 맞춰주었습니다!
-          bottom: device === 'mobile' ? '10vw' : '0vh',
+          bottom: device === 'mobile' ? '0vw' : '0vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
       },
