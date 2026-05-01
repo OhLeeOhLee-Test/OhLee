@@ -13,18 +13,18 @@ export const getStageConfig = (device) => {
       outDir: 'bottom',
       positions: {
         sec0: {
-          left: device === 'mobile' ? '85vw' : '90vw',
-          bottom: device === 'mobile' ? '10vh' : '-125vh',
+          left: device === 'mobile' ? '95vw' : '90vw',
+          bottom: device === 'mobile' ? '-55vh' : '-125vh',
           scale: device === 'mobile' ? 3 : 1.5,
         },
         sec1: {
-          left: device === 'mobile' ? '50vw' : '15vw',
-          bottom: device === 'mobile' ? '10vh' : '-50vh',
+          left: device === 'mobile' ? '15vw' : '15vw',
+          bottom: device === 'mobile' ? '-5vh' : '-50vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
         sec2: {
-          left: device === 'mobile' ? '50vw' : '-35vw',
-          bottom: device === 'mobile' ? '10vh' : '0vh',
+          left: device === 'mobile' ? '15vw' : '-35vw',
+          bottom: device === 'mobile' ? '-5vh' : '0vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
       },
@@ -83,8 +83,8 @@ export const getStageConfig = (device) => {
         left: device === 'mobile' ? '80vw' : '50vw',
         bottom: device === 'mobile' ? '0vh' : '2vh',
         // ⭐️ 480px, 960px의 거대한 픽셀을 비율에 맞게 vw로 변환! (1:2 비율 완벽 유지)
-        width: device === 'mobile' ? '45vw' : '200px',
-        height: device === 'mobile' ? '90vw' : '400px',
+        width: device === 'mobile' ? '60vw' : '200px',
+        height: device === 'mobile' ? '120vw' : '400px',
         zIndex: 10,
         outDir: 'bottom',
         walkToLeft: device === 'mobile' ? '60vw' : '10vw',
