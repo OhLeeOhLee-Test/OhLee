@@ -89,7 +89,7 @@ export const getStageConfig = (device) => {
         zIndex: 10,
         outDir: 'bottom',
         // ⭐️ 오리가 움직일 목표 좌표 (walkToX -> walkToLeft)
-        walkToLeft: device === 'mobile' ? '35vw' : '10vw',
+        walkToLeft: device === 'mobile' ? '50vw' : '10vw',
       },
     },
 
@@ -123,14 +123,14 @@ export const getStageConfig = (device) => {
       // 📬 우편함
       mailbox: {
         left: device === 'mobile' ? '150vw' : '280vw',
-        bottom: device === 'mobile' ? '-37vh' : '0vh',
+        bottom: device === 'mobile' ? '-50vh' : '0vh',
         width: device === 'mobile' ? '750px' : '150px',
         // ⭐️ 원상복구! 감독님이 세팅하신 height를 다시 살렸습니다.
         height: device === 'mobile' ? '1500px' : '300px',
         zIndex: 10,
         outDir: 'bottom',
         // ⭐️ 오리가 움직일 목표 좌표 (walkToX -> walkToLeft)
-        walkToLeft: device === 'mobile' ? '35vw' : '30vw',
+        walkToLeft: device === 'mobile' ? '50vw' : '30vw',
       },
     },
   };
