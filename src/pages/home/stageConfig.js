@@ -14,7 +14,7 @@ export const getStageConfig = (device) => {
       positions: {
         sec0: {
           left: device === 'mobile' ? '95vw' : '90vw',
-          bottom: device === 'mobile' ? '0vh' : '-125vh',
+          bottom: device === 'mobile' ? '-10vh' : '-125vh',
           scale: device === 'mobile' ? 3 : 1.5,
         },
         sec1: {
