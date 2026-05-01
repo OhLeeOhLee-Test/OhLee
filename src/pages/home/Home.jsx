@@ -14,7 +14,6 @@ import { getStageConfig } from './stageConfig';
 
 gsap.registerPlugin(Observer);
 
-// ⭐️ GSAP 조종용 부모 껍데기 스타일
 const CLOUD_WRAPPER_STYLE = {
   position: 'absolute',
   width: '100%',
@@ -41,16 +40,13 @@ export default function Home() {
   };
   const [deviceType, setDeviceType] = useState(getDeviceType());
 
-  // ⭐️ 리액트 방어 1: 기기가 바뀌지 않는 한 설정값을 재생성하지 않음
   const STAGE_CONFIG = useMemo(() => getStageConfig(deviceType), [deviceType]);
 
-  // ⭐️ 수정된 부분: 태양 궤도를 조종실(STAGE_CONFIG)에서 가져와서 계산!
-  const timeData = useMemo(() => {
+  const [timeData] = useState(() => {
     const hour = new Date().getHours();
     const isDay = hour >= 6 && hour < 19;
     const progress = isDay ? (hour - 6) / 13 : 0;
 
-    // 조종실에서 값 가져오기 (만약 값이 없으면 기본값 40, 30 사용)
     const baseY = STAGE_CONFIG.sky.sun.baseY || 40;
     const amplitude = STAGE_CONFIG.sky.sun.amplitude || 30;
 
@@ -59,12 +55,11 @@ export default function Home() {
       sunStyle: isDay
         ? {
             left: `${80 - progress * 70}vw`,
-            // ⭐️ 수학 공식 안에 조종실 값(baseY, amplitude) 투입!
             top: `${baseY - Math.sin(progress * Math.PI) * amplitude}vh`,
           }
         : {},
     };
-  }, [STAGE_CONFIG]); // 조종실 설정이 바뀌면 태양 위치도 즉시 재계산!
+  });
 
   useEffect(() => {
     const handleResize = () => setDeviceType(getDeviceType());
@@ -90,27 +85,87 @@ export default function Home() {
       );
   }, [isMailboxOpen]);
 
+  // ==========================================
+  // ⭐️ 1. 완벽 동기화 걷기 엔진 (가상의 그림자 로직)
+  // ==========================================
+  const playSyncWalk = (duration, easeCurve, steps = 16) => {
+    const proxy = { p: 0 };
+    gsap.killTweensOf('.duck-sprite', 'y');
+
+    gsap.to(proxy, {
+      p: 1,
+      duration: duration,
+      ease: easeCurve,
+      onUpdate: () => {
+        // ⭐️ 진폭(점프 높이) 조절: 맨 끝의 '-15' 숫자를 0에 가깝게(-10, -5 등) 줄이면 얌전해집니다!
+        const bounce = Math.abs(Math.sin(proxy.p * Math.PI * steps)) * -15;
+        gsap.set('.duck-sprite', { y: bounce });
+      },
+      onComplete: () => gsap.set('.duck-sprite', { y: 0 }),
+    });
+  };
+
+  // ==========================================
+  // ⭐️ 2. 지능형 아이리스(Iris) 효과 트랜지션
+  // ==========================================
+  const triggerIrisTransition = (isEntering, onCompleteCallback) => {
+    const duckImg = document.querySelector('.duck-image');
+    let originX = window.innerWidth / 2;
+    let originY = window.innerHeight / 2;
+
+    if (duckImg) {
+      const rect = duckImg.getBoundingClientRect();
+      if (rect.width > 0 && rect.left >= 0 && rect.right <= window.innerWidth) {
+        originX = rect.left + rect.width / 2;
+        originY = rect.top + rect.height / 2;
+      }
+    }
+
+    const startSize = isEntering ? '0px' : '300vmax';
+    const endSize = isEntering ? '300vmax' : '0px';
+
+    gsap.fromTo(
+      '.iris-overlay',
+      {
+        display: 'block',
+        position: 'fixed',
+        left: originX,
+        top: originY,
+        xPercent: -50,
+        yPercent: -50,
+        width: startSize,
+        height: startSize,
+        borderRadius: '50%',
+        boxShadow: '0 0 0 300vmax #000',
+        backgroundColor: 'transparent',
+        zIndex: 9999,
+      },
+      {
+        width: endSize,
+        height: endSize,
+        duration: 1.5,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          if (isEntering) gsap.set('.iris-overlay', { display: 'none' });
+          if (onCompleteCallback) onCompleteCallback();
+        },
+      }
+    );
+  };
+
   const handleWindmillClick = () => {
     if (isAnimatingRef.current) return;
     isAnimatingRef.current = true;
+
+    // ⭐️ 진동수 조절 1: 풍차로 걸어갈 때의 걸음수 (기본 16보)
+    playSyncWalk(2.5, 'power1.inOut', 8);
     gsap.to('.duck-container', {
-      x: STAGE_CONFIG.sec1.windmill.walkToX || '10vw',
+      left: STAGE_CONFIG.sec1.windmill.walkToLeft || '10vw',
       duration: 2.5,
       ease: 'power1.inOut',
       onComplete: () => {
         sessionStorage.setItem('playIris', 'true');
-        gsap.set('.iris-overlay', {
-          display: 'block',
-          width: '300vmax',
-          height: '300vmax',
-        });
-        gsap.to('.iris-overlay', {
-          width: '0px',
-          height: '0px',
-          duration: 1.5,
-          ease: 'power2.inOut',
-          onComplete: () => navigate('/projects/Projects'),
-        });
+        triggerIrisTransition(false, () => navigate('/projects/Projects'));
       },
     });
   };
@@ -118,8 +173,11 @@ export default function Home() {
   const handleMailboxClick = () => {
     if (isAnimatingRef.current) return;
     isAnimatingRef.current = true;
+
+    // ⭐️ 진동수 조절 2: 우편함으로 걸어갈 때의 걸음수 (기본 16보)
+    playSyncWalk(2.5, 'power1.inOut', 8);
     gsap.to('.duck-container', {
-      x: STAGE_CONFIG.sec2.mailbox.walkToX || '10vw',
+      left: STAGE_CONFIG.sec2.mailbox.walkToLeft || '10vw',
       duration: 2.5,
       ease: 'power1.inOut',
       onComplete: () => {
@@ -133,59 +191,37 @@ export default function Home() {
     if (isAnimatingRef.current) return;
     isAnimatingRef.current = true;
     sessionStorage.setItem('playIris', 'true');
-    gsap.set('.iris-overlay', {
-      display: 'block',
-      width: '300vmax',
-      height: '300vmax',
-    });
-    gsap.to('.iris-overlay', {
-      width: '0px',
-      height: '0px',
-      duration: 1.5,
-      ease: 'power2.inOut',
-      onComplete: () => navigate('/projects/Projects'),
-    });
+    triggerIrisTransition(false, () => navigate('/projects/Projects'));
   };
 
   useLayoutEffect(() => {
     if (shouldPlayIris) {
       sessionStorage.removeItem('playIris');
-      gsap.set('.iris-overlay', {
-        display: 'block',
-        width: '0px',
-        height: '0px',
-      });
-      gsap.to('.iris-overlay', {
-        width: '300vmax',
-        height: '300vmax',
-        duration: 1.5,
-        ease: 'power2.inOut',
-        onComplete: () => gsap.set('.iris-overlay', { display: 'none' }),
-      });
+      setTimeout(() => {
+        triggerIrisTransition(true);
+      }, 100);
     }
   }, [shouldPlayIris]);
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
-      // ==========================================
-      // ⭐️ 1. 초기 세팅: 메인(섹션 1)에서는 오리만 빼고 다 숨김!
-      // ==========================================
       gsap.set('.project-panel, .contact-panel', { opacity: 0, autoAlpha: 0 });
       gsap.set('.sky-bg', { autoAlpha: 0 });
       gsap.set('.ground-bg', { y: '100%' });
-
-      // 하늘(해, 구름)은 하늘 위(-150vh)에 대기
       gsap.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh', opacity: 1 });
-      // 땅 에셋(나무, 풍차 등)은 땅 밑(150vh)에 대기
       gsap.set('.deco', { y: '150vh', opacity: 1 });
 
-      // 오리만 메인 화면 정위치에 세팅
+      // ⭐️ 오리의 위치를 창 크기가 변해도 끄떡없는 left, bottom으로 세팅!
       gsap.set('.duck-container', {
-        x: STAGE_CONFIG.duck.positions.sec0.x,
-        y: STAGE_CONFIG.duck.positions.sec0.y,
+        top: 'auto',
+        left: STAGE_CONFIG.duck.positions.sec0.left,
+        bottom: STAGE_CONFIG.duck.positions.sec0.bottom,
         scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
         scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
+        transformOrigin: 'bottom center',
         opacity: 1,
+        x: 0,
+        y: 0,
       });
 
       const goToSection = (newIndex, isMenu = false, openContact = false) => {
@@ -213,9 +249,6 @@ export default function Home() {
             },
           });
 
-          // ==========================================
-          // ⭐️ 2. 퇴장 모션: 무조건 전부 화면 밖으로 치워버림
-          // ==========================================
           tl.to(
             '.duck-container, .deco',
             { y: '150vh', duration: 0.8, stagger: 0.05, ease: 'back.in(1.2)' },
@@ -228,9 +261,8 @@ export default function Home() {
           );
           tl.to('.panel', { autoAlpha: 0, duration: 0.3 }, 0);
 
-          const enterTime = 1.5; // 모든 에셋이 완전히 퇴장할 때까지 기다리는 시간
+          const enterTime = 1.5;
 
-          // 배경 전환
           if (newIndex === 0) {
             tl.to('.sky-bg', { autoAlpha: 0, duration: 0.8 }, enterTime).to(
               '.ground-bg',
@@ -245,7 +277,6 @@ export default function Home() {
             );
           }
 
-          // 패널, 카메라 이동 세팅
           tl.set(`.panel`, { autoAlpha: 0 }, enterTime)
             .set(
               newIndex === 0
@@ -262,20 +293,16 @@ export default function Home() {
               enterTime
             );
 
-          // ==========================================
-          // ⭐️ 3. 등장 모션: 어디로 가느냐에 따라 갈림
-          // ==========================================
           if (newIndex === 0) {
-            // [섹션 1 (메인 홈)으로 올 때]
-            tl.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh' }, enterTime); // 하늘 숨김 유지
-            tl.set('.deco', { y: '150vh' }, enterTime); // 땅 에셋 숨김 유지
+            tl.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh' }, enterTime);
+            tl.set('.deco', { y: '150vh' }, enterTime);
 
-            // 오리만 밑에서 띠용! 하고 혼자 올라옴
             tl.set(
               '.duck-container',
               {
-                x: STAGE_CONFIG.duck.positions.sec0.x,
-                y: '150vh',
+                left: STAGE_CONFIG.duck.positions.sec0.left,
+                bottom: STAGE_CONFIG.duck.positions.sec0.bottom,
+                y: '150vh', // 위에서 떨어지는 효과를 위해 y 사용
                 scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
                 scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
               },
@@ -283,16 +310,10 @@ export default function Home() {
             );
             tl.to(
               '.duck-container',
-              {
-                y: STAGE_CONFIG.duck.positions.sec0.y,
-                duration: 1,
-                ease: 'elastic.out(1, 0.5)',
-              },
+              { y: 0, duration: 1, ease: 'elastic.out(1, 0.5)' },
               enterTime
             );
           } else {
-            // [섹션 2, 3 (풍차, 우편함)으로 갈 때]
-            // 하늘(해, 구름)이 위에서 띠용! 내려옴
             tl.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh' }, enterTime);
             tl.to(
               '.sun-wrapper, .cloud-wrapper',
@@ -300,7 +321,6 @@ export default function Home() {
               enterTime
             );
 
-            // 땅 에셋(나무, 풍차 등)이 밑에서 띠용! 올라옴
             tl.set('.deco', { y: '150vh' }, enterTime);
             tl.to(
               '.deco',
@@ -313,25 +333,27 @@ export default function Home() {
               enterTime
             );
 
-            // 오리는 화면 왼쪽 밖에서 터벅터벅 걸어 들어옴!
             tl.set(
               '.duck-container',
               {
-                x: '-100vw',
-                y: duckPos.y,
+                left: '-50vw',
+                bottom: duckPos.bottom,
+                y: 0,
                 scaleX: duckPos.scale,
                 scaleY: duckPos.scale,
               },
               enterTime
             );
+
+            // ⭐️ 진동수 조절 3: 화면 밖에서 걸어 들어올 때의 걸음수 (기본 16보)
+            tl.add(() => playSyncWalk(2.5, 'power2.out', 10), enterTime);
             tl.to(
               '.duck-container',
-              { x: duckPos.x, duration: 2.5, ease: 'power2.out' },
+              { left: duckPos.left, duration: 2.5, ease: 'power2.out' },
               enterTime
             );
           }
         } else {
-          // 걷기 (섹션 2 ↔ 3 이동 시에는 하늘은 어차피 보여져 있으므로 냅둠)
           const tl = gsap.timeline({
             onComplete: () => {
               isAnimatingRef.current = false;
@@ -343,6 +365,8 @@ export default function Home() {
             scaleX: targetScaleX,
             scaleY: duckPos.scale,
           })
+            // ⭐️ 진동수 조절 4: 스크롤로 무대 1 <-> 2 이동할 때의 걸음수 (기본 14보)
+            .add(() => playSyncWalk(2, 'power2.inOut', 10), 'walk')
             .to(
               '.ground',
               { x: xMove, duration: 2, ease: 'power2.inOut' },
@@ -350,7 +374,12 @@ export default function Home() {
             )
             .to(
               '.duck-container',
-              { x: duckPos.x, y: duckPos.y, duration: 2, ease: 'power2.inOut' },
+              {
+                left: duckPos.left,
+                bottom: duckPos.bottom,
+                duration: 2,
+                ease: 'power2.inOut',
+              },
               'walk'
             )
             .to('.duck-container', {
@@ -371,15 +400,6 @@ export default function Home() {
         }
       };
 
-      if (sessionStorage.getItem('goToContact') === 'true') {
-        sessionStorage.removeItem('goToContact');
-        setTimeout(() => goToSection(2, true, true), 100);
-      }
-      if (sessionStorage.getItem('goToWindmill') === 'true') {
-        sessionStorage.removeItem('goToWindmill');
-        setTimeout(() => goToSection(1, true, false), 100);
-      }
-
       Observer.create({
         target: window,
         type: 'wheel,touch',
@@ -387,9 +407,14 @@ export default function Home() {
         preventDefault: false,
         onChangeY: (self) => {
           if (isAnimatingRef.current) return;
-          if (self.deltaY > 0 && currentIndexRef.current < 2)
+          const isTouch =
+            self.event.type.includes('touch') ||
+            self.event.type.includes('pointer');
+          const delta = isTouch ? -self.deltaY : self.deltaY;
+
+          if (delta > 0 && currentIndexRef.current < 2)
             goToSection(currentIndexRef.current + 1);
-          else if (self.deltaY < 0 && currentIndexRef.current > 0)
+          else if (delta < 0 && currentIndexRef.current > 0)
             goToSection(currentIndexRef.current - 1);
         },
       });
@@ -412,25 +437,22 @@ export default function Home() {
     <div className="home-container" ref={homeRef}>
       <div className="sky">
         <div className="sky-bg"></div>
-
         {timeData.isDay && (
           <div className="sun-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
             <img
               src={`${import.meta.env.BASE_URL}assets/Sun.png`}
               alt="Sun"
               className="sun"
-              // ⭐️ 시간에 따른 위치(timeData.sunStyle) + 설정파일의 크기(STAGE_CONFIG.sky.sun) 결합!
               style={{ ...timeData.sunStyle, ...STAGE_CONFIG.sky.sun }}
             />
           </div>
         )}
-
         <div className="cloud-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
           <img
             src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
             alt="Cloud"
             className="cloud cloud1"
-            style={STAGE_CONFIG.sky.cloud1} // ⭐️ 조종실 연결!
+            style={STAGE_CONFIG.sky.cloud1}
           />
         </div>
         <div className="cloud-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
@@ -438,7 +460,7 @@ export default function Home() {
             src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
             alt="Cloud"
             className="cloud cloud2"
-            style={STAGE_CONFIG.sky.cloud2} // ⭐️ 조종실 연결!
+            style={STAGE_CONFIG.sky.cloud2}
           />
         </div>
       </div>
@@ -474,6 +496,7 @@ export default function Home() {
           alt=""
         />
 
+        {/* ⭐️ 풍차 원상복구: 상자 안에서 이미지가 꽉 차게(absolute, 100%) 들어가야 날개 위치가 안 깨집니다! */}
         <div
           className="deco puppet"
           style={{ ...STAGE_CONFIG.sec1.windmill, cursor: 'pointer' }}
@@ -523,6 +546,7 @@ export default function Home() {
           alt=""
         />
 
+        {/* ⭐️ 우편함 원상복구: objectFit: contain 복구! */}
         <img
           src={`${import.meta.env.BASE_URL}assets/Mailbox.png`}
           alt="Mailbox"
@@ -600,41 +624,8 @@ export default function Home() {
 
       <div
         className="iris-overlay"
-        style={{
-          display: shouldPlayIris ? 'block' : 'none',
-          width: '0px',
-          height: '0px',
-        }}
+        style={{ display: shouldPlayIris ? 'block' : 'none' }}
       ></div>
     </div>
   );
 }
-
-const contactStyles = {
-  card: {
-    backgroundColor: '#fff',
-    padding: '40px',
-    borderRadius: '20px',
-    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-    width: '350px',
-    textAlign: 'center',
-  },
-  form: { display: 'flex', flexDirection: 'column', gap: '15px' },
-  input: { padding: '12px', border: '1px solid #ddd', borderRadius: '8px' },
-  textarea: {
-    padding: '12px',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    height: '80px',
-    resize: 'none',
-  },
-  button: {
-    padding: '12px',
-    backgroundColor: '#111',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-  },
-};

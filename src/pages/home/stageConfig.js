@@ -1,8 +1,6 @@
 // stageConfig.js
 
 export const getStageConfig = (device) => {
-  // ⭐️ 뭉뚱그려 쓰던 scale 변수는 완전히 삭제했습니다! 이제 모든 걸 직접 통제합니다.
-
   return {
     groundOffset: device === 'mobile' ? '-120vw' : '-200vw',
 
@@ -14,19 +12,21 @@ export const getStageConfig = (device) => {
     duck: {
       outDir: 'bottom',
       positions: {
+        // ⭐️ 오리의 x, y를 left, bottom으로 이름만 바꿨습니다!
+        // (y를 bottom으로 바꾸면서 위치가 살짝 달라질 수 있으니 이 수치만 한 번 더 깎아주세요)
         sec0: {
-          x: device === 'mobile' ? '45vw' : '25vw',
-          y: device === 'mobile' ? '55vh' : '-20vh',
+          left: device === 'mobile' ? '95vw' : '25vw',
+          bottom: device === 'mobile' ? '-40vh' : '-20vh',
           scale: device === 'mobile' ? 3 : 1,
         },
         sec1: {
-          x: device === 'mobile' ? '-30vw' : '-35vw',
-          y: device === 'mobile' ? '20vh' : '0vh',
+          left: device === 'mobile' ? '20vw' : '-35vw',
+          bottom: device === 'mobile' ? '0vh' : '0vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
         sec2: {
-          x: device === 'mobile' ? '-30vw' : '-35vw',
-          y: device === 'mobile' ? '20vh' : '0vh',
+          left: device === 'mobile' ? '20vw' : '-35vw',
+          bottom: device === 'mobile' ? '0vh' : '0vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
       },
@@ -85,10 +85,12 @@ export const getStageConfig = (device) => {
         left: device === 'mobile' ? '45vw' : '50vw',
         bottom: device === 'mobile' ? '-12vh' : '2vh',
         width: device === 'mobile' ? '480px' : '200px',
+        // ⭐️ 원상복구! 감독님이 세팅하신 height를 다시 살렸습니다.
         height: device === 'mobile' ? '960px' : '400px',
         zIndex: 10,
         outDir: 'bottom',
-        walkToX: device === 'mobile' ? '0vw' : '10vw',
+        // ⭐️ 오리가 움직일 목표 좌표 (walkToX -> walkToLeft)
+        walkToLeft: device === 'mobile' ? '0vw' : '10vw',
       },
     },
 
@@ -124,10 +126,12 @@ export const getStageConfig = (device) => {
         left: device === 'mobile' ? '150vw' : '280vw',
         bottom: device === 'mobile' ? '-37vh' : '0vh',
         width: device === 'mobile' ? '750px' : '150px',
+        // ⭐️ 원상복구! 감독님이 세팅하신 height를 다시 살렸습니다.
         height: device === 'mobile' ? '1500px' : '300px',
         zIndex: 10,
         outDir: 'bottom',
-        walkToX: device === 'mobile' ? '5vw' : '30vw',
+        // ⭐️ 오리가 움직일 목표 좌표 (walkToX -> walkToLeft)
+        walkToLeft: device === 'mobile' ? '5vw' : '30vw',
       },
     },
   };

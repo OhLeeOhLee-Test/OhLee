@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap'; // ⭐️ 들썩임 애니메이션을 위해 GSAP 추가!
 import './Duck.css';
 
 export default function Duck() {
-  const duckRef = useRef(null);
+  const duckRef = useRef(null); // 오리 이미지 조종용
+  const spriteRef = useRef(null); // ⭐️ 오리를 감싼 박스 조종용 (들썩임 전용)
 
   const [frameIndex, setFrameIndex] = useState(32);
-  // ⭐️ 수정 1: 처음에 찰나의 순간 뒤집히는 버그 방지 (무조건 처음엔 정방향으로 시작!)
   const [isFlipped, setIsFlipped] = useState(false);
 
   const targetFrame = useRef(32);
@@ -13,10 +14,13 @@ export default function Duck() {
   const lastRenderedFrame = useRef(32);
   const requestRef = useRef();
 
-  // ⭐️ 안전장치: 무대를 빠르게 넘나들 때 타이머가 꼬이는 걸 방지
   const flipTimeoutRef = useRef(null);
+  const audioRef = useRef(null);
 
   useEffect(() => {
+    // 꽥꽥 사운드 미리 로드
+    audioRef.current = new Audio(`${import.meta.env.BASE_URL}assets/Quack.mp3`);
+
     const animateHead = () => {
       if (currentFrame.current !== targetFrame.current) {
         const diff = targetFrame.current - currentFrame.current;
@@ -44,15 +48,12 @@ export default function Duck() {
     const observer = new MutationObserver(() => {
       const currentSection = document.body.getAttribute('data-section');
 
-      // 기존에 돌고 있던 반전 타이머가 있다면 캔슬 (빠른 스크롤 대비)
       if (flipTimeoutRef.current) clearTimeout(flipTimeoutRef.current);
 
       if (currentSection !== '0') {
-        // [섹션 2, 3으로 갈 때]
         targetFrame.current = 32;
         flipTimeoutRef.current = setTimeout(() => setIsFlipped(true), 800);
       } else {
-        // [섹션 1 메인으로 돌아올 때]
         targetFrame.current = 32;
         flipTimeoutRef.current = setTimeout(() => setIsFlipped(false), 800);
       }
@@ -69,7 +70,7 @@ export default function Duck() {
       if (currentSection !== '0') return;
       if (!duckRef.current) return;
 
-      const frameCount = 61; // 총 61장 (0 ~ 60)
+      const frameCount = 61;
       const max_angle = 270;
       const min_angle = 150;
 
@@ -90,9 +91,8 @@ export default function Duck() {
 
       const progress = (deg - min_angle) / (max_angle - min_angle);
 
-      // ⭐️ 수정 2: +1을 삭제하여 0 ~ 60번 이미지가 나오도록 매핑!
       let newIndex = Math.floor(progress * frameCount);
-      newIndex = Math.max(0, Math.min(frameCount - 1, newIndex)); // 최소 0, 최대 60 보장
+      newIndex = Math.max(0, Math.min(frameCount - 1, newIndex));
 
       targetFrame.current = newIndex;
     };
@@ -114,8 +114,31 @@ export default function Duck() {
     };
   }, []);
 
+  // ⭐️ 꽥꽥 소리와 함께 들썩이는 로직!
+  const handleDuckClick = () => {
+    // 1. 소리 재생
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    }
+
+    // 2. 들썩임 애니메이션 (GSAP)
+    if (spriteRef.current) {
+      // 혹시 여러 번 광클했을 때 애니메이션이 꼬이지 않도록 이전 움직임을 킬(kill)
+      gsap.killTweensOf(spriteRef.current);
+
+      // 위로 15px 튀어 올랐다가(yoyo), 제자리로 돌아옴(repeat: 1)
+      gsap.fromTo(
+        spriteRef.current,
+        { y: 0 },
+        { y: -15, duration: 0.1, yoyo: true, repeat: 1, ease: 'power1.inOut' }
+      );
+    }
+  };
+
   return (
-    <div className="duck-sprite">
+    // ⭐️ 껍데기(spriteRef) 전체가 들썩이도록 ref 연결!
+    <div className="duck-sprite" ref={spriteRef}>
       <img
         ref={duckRef}
         src={`${
@@ -123,11 +146,13 @@ export default function Duck() {
         }assets/duck_sprites/Duck_${frameIndex}.png`}
         alt={`Duck Frame ${frameIndex}`}
         className="duck-image"
+        onClick={handleDuckClick}
         style={{
           width: '100%',
           height: 'auto',
           display: 'block',
           transform: isFlipped ? 'scaleX(-1)' : 'none',
+          cursor: 'pointer',
         }}
       />
     </div>
