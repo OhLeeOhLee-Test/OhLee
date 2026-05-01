@@ -16,17 +16,17 @@ export const getStageConfig = (device) => {
         // (y를 bottom으로 바꾸면서 위치가 살짝 달라질 수 있으니 이 수치만 한 번 더 깎아주세요)
         sec0: {
           left: device === 'mobile' ? '95vw' : '25vw',
-          bottom: device === 'mobile' ? '-40vh' : '-20vh',
+          bottom: device === 'mobile' ? '-20vh' : '-20vh',
           scale: device === 'mobile' ? 3 : 1,
         },
         sec1: {
           left: device === 'mobile' ? '20vw' : '-35vw',
-          bottom: device === 'mobile' ? '0vh' : '0vh',
+          bottom: device === 'mobile' ? '15vh' : '0vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
         sec2: {
           left: device === 'mobile' ? '20vw' : '-35vw',
-          bottom: device === 'mobile' ? '0vh' : '0vh',
+          bottom: device === 'mobile' ? '15vh' : '0vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
       },
@@ -85,7 +85,6 @@ export const getStageConfig = (device) => {
         left: device === 'mobile' ? '45vw' : '50vw',
         bottom: device === 'mobile' ? '-12vh' : '2vh',
         width: device === 'mobile' ? '480px' : '200px',
-        // ⭐️ 원상복구! 감독님이 세팅하신 height를 다시 살렸습니다.
         height: device === 'mobile' ? '960px' : '400px',
         zIndex: 10,
         outDir: 'bottom',
