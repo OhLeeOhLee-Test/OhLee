@@ -122,8 +122,8 @@ export const getStageConfig = (device) => {
 
       // 📬 우편함
       mailbox: {
-        left: device === 'mobile' ? '140vw' : '280vw',
-        bottom: device === 'mobile' ? '-40vh' : '0vh',
+        left: device === 'mobile' ? '120vw' : '280vw',
+        bottom: device === 'mobile' ? '-30vh' : '0vh',
         width: device === 'mobile' ? '750px' : '150px',
         // ⭐️ 원상복구! 감독님이 세팅하신 height를 다시 살렸습니다.
         height: device === 'mobile' ? '1500px' : '300px',
