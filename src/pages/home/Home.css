@@ -44,6 +44,7 @@ body {
   bottom: 0;
   left: 0;
   width: 300vw;
+  /* 💻 PC에서는 가로가 기니까 안전하게 vh를 사용합니다! */
   height: 35vh;
   z-index: 0 !important;
   display: flex;
@@ -67,7 +68,6 @@ body {
 /* ⭐️ 오리 발목선 부활! 이제 대각선으로 엇나가지 않습니다 */
 .duck-container {
   position: absolute;
-  bottom: 20vh; /* 땅 높이(20vh)에 완벽하게 일치 */
   z-index: 1 !important;
   pointer-events: auto !important;
   transform-origin: bottom center; /* 크기가 변해도 바닥에 고정됨 */
@@ -169,23 +169,28 @@ body {
 /* ⚙️ 풍차 날개 빙글빙글 애니메이션 */
 .windmill-wing {
   position: absolute;
-  /* 🚨 중요: 날개의 중심(축)이 몸통의 어디에 꽂혀야 하는지 아래 top, left 비율을 조절해서 맞추세요! */
   top: 40.5%;
   left: 30.5%;
-  width: 75%; /* 보통 날개가 몸통보다 훨씬 큽니다. 크기를 조절하세요 */
-
-  /* 중심축을 날개 이미지의 한가운데로 설정 */
+  width: 75%;
   transform-origin: center center;
-  /* 8s: 8초에 한 바퀴 (더 빠르게 하려면 4s 등으로 줄이세요) */
   animation: spinWing 8s linear infinite;
 }
 
 @keyframes spinWing {
-  /* translate(-50%, -50%)를 유지하면서 제자리 회전! */
   0% {
     transform: translate(-50%, -50%) rotate(0deg);
   }
   100% {
     transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* ==========================================
+   📱 5. 모바일 반응형 매직 (가장 중요!)
+========================================== */
+@media (max-width: 768px) {
+  .ground {
+    /* ⭐️ 모바일에서는 땅의 높이도 가로 너비(vw) 비율에 맞춰 묶어버립니다! */
+    height: 40vw;
   }
 }

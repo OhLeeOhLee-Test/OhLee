@@ -241,7 +241,6 @@ export default function Home() {
       gsap.set('.ground-bg', { y: '100%' });
       gsap.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh', opacity: 1 });
 
-      // ⭐️ 모든 소품의 기준점을 정중앙(xPercent: -50) 바닥으로 완벽 통일!
       gsap.set('.deco', {
         y: '150vh',
         opacity: 1,
@@ -249,7 +248,6 @@ export default function Home() {
         transformOrigin: 'bottom center',
       });
 
-      // ⭐️ 오리의 기준점도 완벽 통일 및 뚝배기(top) 끄기!
       gsap.set('.duck-container', {
         top: 'auto',
         left: STAGE_CONFIG.duck.positions.sec0.left,
@@ -443,8 +441,10 @@ export default function Home() {
         preventDefault: false,
         onChangeY: (self) => {
           if (isAnimatingRef.current) return;
-          // ⭐️ 모바일 스크롤 & PC 마우스 휠 방향 완벽 통일! (-) 적용!
-          const delta = -self.deltaY;
+          const isTouch =
+            self.event.type.includes('touch') ||
+            self.event.type.includes('pointer');
+          const delta = isTouch ? -self.deltaY : -self.deltaY; // 감독님의 완벽한 한 줄 세팅!
 
           if (delta > 0 && currentIndexRef.current < 2)
             goToSection(currentIndexRef.current + 1);
