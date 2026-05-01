@@ -81,10 +81,10 @@ export const getStageConfig = (device) => {
 
       windmill: {
         left: device === 'mobile' ? '80vw' : '50vw',
-        bottom: device === 'mobile' ? '-30vh' : '2vh',
+        bottom: device === 'mobile' ? '0vh' : '2vh',
         // ⭐️ 480px, 960px의 거대한 픽셀을 비율에 맞게 vw로 변환! (1:2 비율 완벽 유지)
-        width: device === 'mobile' ? '120vw' : '200px',
-        height: device === 'mobile' ? '240vw' : '400px',
+        width: device === 'mobile' ? '45vw' : '200px',
+        height: device === 'mobile' ? '90vw' : '400px',
         zIndex: 10,
         outDir: 'bottom',
         walkToLeft: device === 'mobile' ? '60vw' : '10vw',
@@ -95,8 +95,8 @@ export const getStageConfig = (device) => {
     sec2: {
       tree: {
         left: device === 'mobile' ? '225vw' : '90vw',
-        bottom: device === 'mobile' ? '0vh' : '0vh',
-        width: device === 'mobile' ? '50vw' : '250px',
+        bottom: device === 'mobile' ? '20vh' : '0vh',
+        width: device === 'mobile' ? '40vw' : '250px',
         outDir: 'bottom',
       },
       grass2: {
@@ -119,11 +119,11 @@ export const getStageConfig = (device) => {
       },
 
       mailbox: {
-        left: device === 'mobile' ? '200vw' : '280vw',
-        bottom: device === 'mobile' ? '-30vh' : '0vh',
+        left: device === 'mobile' ? '195vw' : '280vw',
+        bottom: device === 'mobile' ? '6vh' : '0vh',
         // ⭐️ 750px, 1500px의 화면을 찢고 나가는 픽셀을 vw로 변환!
-        width: device === 'mobile' ? '190vw' : '150px',
-        height: device === 'mobile' ? '380vw' : '300px',
+        width: device === 'mobile' ? '35vw' : '150px',
+        height: device === 'mobile' ? '70vw' : '300px',
         zIndex: 10,
         outDir: 'bottom',
         walkToLeft: device === 'mobile' ? '55vw' : '30vw',
