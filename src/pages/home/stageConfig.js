@@ -19,13 +19,14 @@ export const getStageConfig = (device) => {
         },
         sec1: {
           left: device === 'mobile' ? '15vw' : '15vw',
-          // 원본 15vh -> 30vw (40vw 땅 안에 예쁘게 들어옴!)
-          bottom: device === 'mobile' ? '30vw' : '-50vh',
+          // ⭐️ 풍차(0vw)와 같은 라인의 땅을 밟도록 오리를 끌어내렸습니다!
+          bottom: device === 'mobile' ? '0vw' : '-50vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
         sec2: {
           left: device === 'mobile' ? '15vw' : '-35vw',
-          bottom: device === 'mobile' ? '30vw' : '0vh',
+          // ⭐️ 우편함(12vw) 바로 앞의 땅을 밟도록 오리를 맞춰주었습니다!
+          bottom: device === 'mobile' ? '10vw' : '0vh',
           scale: device === 'mobile' ? 0.7 : 0.4,
         },
       },
