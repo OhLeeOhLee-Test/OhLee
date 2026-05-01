@@ -3,19 +3,27 @@ import './Duck.css';
 
 export default function Duck() {
   const duckRef = useRef(null);
-  const [frameIndex, setFrameIndex] = useState(8); // 처음부터 정면(8)으로 시작
+
+  // ⭐️ 1. 처음 시작할 때 기본 이미지를 32번으로 설정!
+  const [frameIndex, setFrameIndex] = useState(32);
+  // CSS 좌우 반전을 위해 현재 메인 무대인지 상태를 저장합니다.
+  const [isMainScreen, setIsMainScreen] = useState(
+    () => document.body.getAttribute('data-section') === '0'
+  );
 
   useEffect(() => {
-    // ⭐️ [수정된 부분] 1. 마우스가 안 움직여도, 무대(data-section)가 바뀌면 바로 감지하는 감시자!
+    // 무대(data-section)가 바뀌는 걸 감지하는 감시자
     const observer = new MutationObserver(() => {
       const currentSection = document.body.getAttribute('data-section');
-      // 0번(홈) 화면이 아니면 무조건 오리를 정면(8)으로 리셋!
-      if (currentSection !== '0') {
-        setFrameIndex(8);
-      }
+      const isMain = currentSection === '0';
+
+      // 메인인지 서브 무대인지 상태 업데이트
+      setIsMainScreen(isMain);
+
+      // ⭐️ 무대가 바뀌면(메인이든 서브든) 일단 기본 자세인 32번으로 고정!
+      setFrameIndex(32);
     });
 
-    // 감시 시작: body 태그의 'data-section' 속성 변화를 지켜봅니다.
     observer.observe(document.body, {
       attributes: true,
       attributeFilter: ['data-section'],
@@ -24,15 +32,15 @@ export default function Duck() {
     const handleMouseMove = (e) => {
       const currentSection = document.body.getAttribute('data-section');
 
-      // 0번 화면이 아니면 마우스를 따라다니지 않고 정면 응시
+      // 메인(0번) 화면이 아니면 마우스 추적을 멈추고 32번 자세 유지
       if (currentSection !== '0') {
-        setFrameIndex(8);
         return;
       }
 
       if (!duckRef.current) return;
 
-      const frameCount = 9;
+      // ⭐️ 2. 프레임 개수를 61개로 수정!
+      const frameCount = 61;
       const max_angle = 270;
       const min_angle = 150;
 
@@ -53,8 +61,11 @@ export default function Duck() {
       }
 
       const progress = (max_angle - deg) / (max_angle - min_angle);
+
+      // ⭐️ progress(0~1)를 1~61번 이미지 번호로 매핑!
+      // (만약 이미지 이름이 Duck_0.png 부터 시작한다면 뒤에 '+ 1'을 빼주세요)
       let newIndex = Math.floor(progress * frameCount);
-      newIndex = Math.max(0, Math.min(frameCount - 1, newIndex));
+      newIndex = Math.max(1, Math.min(frameCount, newIndex)); // 1 ~ 61 제한
 
       setFrameIndex(newIndex);
     };
@@ -63,7 +74,6 @@ export default function Duck() {
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      // 컴포넌트가 꺼질 때 감시자도 같이 꺼줍니다.
       observer.disconnect();
     };
   }, []);
@@ -77,7 +87,13 @@ export default function Duck() {
         }assets/duck_sprites/Duck_${frameIndex}.png`}
         alt={`Duck Frame ${frameIndex}`}
         className="duck-image"
-        style={{ width: '100%', height: 'auto' }}
+        style={{
+          width: '100%',
+          height: 'auto',
+          display: 'block', // 하단 여백 방지
+          // ⭐️ 3. 메인 무대가 아닐 때(서브 무대일 때)만 32번 이미지를 좌우 반전시킴!
+          transform: !isMainScreen ? 'scaleX(-1)' : 'none',
+        }}
       />
     </div>
   );
