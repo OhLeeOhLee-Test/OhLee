@@ -14,14 +14,14 @@ export const getStageConfig = (device) => {
       top: device === 'mobile' ? '15vh' : '40vh',
     },
 
-    // 🦆 오리 위치 및 크기 (기기별로 3단계 조절!)
+    // 🦆 오리 위치 및 크기
     duck: {
       outDir: 'bottom',
       positions: {
         sec0: {
-          x: device === 'mobile' ? '10vw' : '25vw',
-          y: device === 'mobile' ? '25vh' : '-20vh',
-          scale: device === 'mobile' ? 0.7 : 1,
+          x: device === 'mobile' ? '45vw' : '25vw',
+          y: device === 'mobile' ? '55vh' : '-20vh',
+          scale: device === 'mobile' ? 3 : 1,
         },
         sec1: {
           x: device === 'mobile' ? '-10vw' : '-35vw',
@@ -36,11 +36,26 @@ export const getStageConfig = (device) => {
       },
     },
 
-    // ☀️ 구름과 태양 (퇴장 방향)
+    // ☀️ 구름과 태양 (퇴장 방향 + 크기, 위치 설정)
     sky: {
-      sun: { outDir: 'top' },
-      cloud1: { outDir: 'top' },
-      cloud2: { outDir: 'top' },
+      sun: {
+        width: device === 'mobile' ? '30vw' : '20vw',
+        baseY: 40, // 🌅 해가 뜨고 지는 기본 바닥 높이 (vh)
+        amplitude: 30, // ☀️ 정오에 위로 얼마나 솟구칠지 궤도 높이 (vh)
+        outDir: 'top',
+      },
+      cloud1: {
+        top: '10vh', // ⭐️ 구름 높낮이
+        width: device === 'mobile' ? '40vw' : '20vw', // ⭐️ 구름 크기
+        opacity: 0.7,
+        outDir: 'top',
+      },
+      cloud2: {
+        top: '5vh',
+        width: device === 'mobile' ? '30vw' : '15vw',
+        opacity: 0.7,
+        outDir: 'top',
+      },
     },
 
     // 🌍 1번 무대 넓은 맵 에셋 배치

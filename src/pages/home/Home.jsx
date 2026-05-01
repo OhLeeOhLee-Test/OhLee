@@ -41,22 +41,30 @@ export default function Home() {
   };
   const [deviceType, setDeviceType] = useState(getDeviceType());
 
+  // ⭐️ 리액트 방어 1: 기기가 바뀌지 않는 한 설정값을 재생성하지 않음
   const STAGE_CONFIG = useMemo(() => getStageConfig(deviceType), [deviceType]);
 
-  const [timeData] = useState(() => {
+  // ⭐️ 수정된 부분: 태양 궤도를 조종실(STAGE_CONFIG)에서 가져와서 계산!
+  const timeData = useMemo(() => {
     const hour = new Date().getHours();
     const isDay = hour >= 6 && hour < 19;
     const progress = isDay ? (hour - 6) / 13 : 0;
+
+    // 조종실에서 값 가져오기 (만약 값이 없으면 기본값 40, 30 사용)
+    const baseY = STAGE_CONFIG.sky.sun.baseY || 40;
+    const amplitude = STAGE_CONFIG.sky.sun.amplitude || 30;
+
     return {
       isDay,
       sunStyle: isDay
         ? {
             left: `${80 - progress * 70}vw`,
-            top: `${40 - Math.sin(progress * Math.PI) * 30}vh`,
+            // ⭐️ 수학 공식 안에 조종실 값(baseY, amplitude) 투입!
+            top: `${baseY - Math.sin(progress * Math.PI) * amplitude}vh`,
           }
         : {},
     };
-  });
+  }, [STAGE_CONFIG]); // 조종실 설정이 바뀌면 태양 위치도 즉시 재계산!
 
   useEffect(() => {
     const handleResize = () => setDeviceType(getDeviceType());
@@ -411,7 +419,8 @@ export default function Home() {
               src={`${import.meta.env.BASE_URL}assets/Sun.png`}
               alt="Sun"
               className="sun"
-              style={timeData.sunStyle}
+              // ⭐️ 시간에 따른 위치(timeData.sunStyle) + 설정파일의 크기(STAGE_CONFIG.sky.sun) 결합!
+              style={{ ...timeData.sunStyle, ...STAGE_CONFIG.sky.sun }}
             />
           </div>
         )}
@@ -421,6 +430,7 @@ export default function Home() {
             src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
             alt="Cloud"
             className="cloud cloud1"
+            style={STAGE_CONFIG.sky.cloud1} // ⭐️ 조종실 연결!
           />
         </div>
         <div className="cloud-wrapper puppet" style={CLOUD_WRAPPER_STYLE}>
@@ -428,6 +438,7 @@ export default function Home() {
             src={`${import.meta.env.BASE_URL}assets/Cloud.png`}
             alt="Cloud"
             className="cloud cloud2"
+            style={STAGE_CONFIG.sky.cloud2} // ⭐️ 조종실 연결!
           />
         </div>
       </div>
