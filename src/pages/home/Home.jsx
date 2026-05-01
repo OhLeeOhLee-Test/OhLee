@@ -23,8 +23,41 @@ const CLOUD_WRAPPER_STYLE = {
   pointerEvents: 'none',
 };
 
+// ⭐️ [범인 검거] 하얀 화면 크래시를 막기 위해 스타일 보따리를 최상단으로 끌어올렸습니다!
+const contactStyles = {
+  card: {
+    backgroundColor: '#fff',
+    padding: '40px',
+    borderRadius: '20px',
+    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+    width: '350px',
+    textAlign: 'center',
+  },
+  form: { display: 'flex', flexDirection: 'column', gap: '15px' },
+  input: { padding: '12px', border: '1px solid #ddd', borderRadius: '8px' },
+  textarea: {
+    padding: '12px',
+    border: '1px solid #ddd',
+    borderRadius: '8px',
+    height: '80px',
+    resize: 'none',
+  },
+  button: {
+    padding: '12px',
+    backgroundColor: '#111',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+  },
+};
+
 export default function Home() {
   const homeRef = useRef();
+  // ⭐️ 모달창 애니메이션 안정성을 위한 Ref 추가
+  const contactCardRef = useRef();
+
   const navigate = useNavigate();
   const currentIndexRef = useRef(0);
   const isAnimatingRef = useRef(false);
@@ -76,17 +109,19 @@ export default function Home() {
     return () => (document.body.style.overflow = 'auto');
   }, []);
 
+  // ⭐️ 모달창 GSAP 애니메이션 안전장치 적용 (Ref 방식)
   useEffect(() => {
-    if (isMailboxOpen)
+    if (isMailboxOpen && contactCardRef.current) {
       gsap.fromTo(
-        '.contact-card',
+        contactCardRef.current,
         { scale: 0.2, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.5)' }
       );
+    }
   }, [isMailboxOpen]);
 
   // ==========================================
-  // ⭐️ 1. 완벽 동기화 걷기 엔진 (가상의 그림자 로직)
+  // ⭐️ 1. 완벽 동기화 걷기 엔진
   // ==========================================
   const playSyncWalk = (duration, easeCurve, steps = 16) => {
     const proxy = { p: 0 };
@@ -97,7 +132,6 @@ export default function Home() {
       duration: duration,
       ease: easeCurve,
       onUpdate: () => {
-        // ⭐️ 진폭(점프 높이) 조절: 맨 끝의 '-15' 숫자를 0에 가깝게(-10, -5 등) 줄이면 얌전해집니다!
         const bounce = Math.abs(Math.sin(proxy.p * Math.PI * steps)) * -15;
         gsap.set('.duck-sprite', { y: bounce });
       },
@@ -157,7 +191,6 @@ export default function Home() {
     if (isAnimatingRef.current) return;
     isAnimatingRef.current = true;
 
-    // ⭐️ 진동수 조절 1: 풍차로 걸어갈 때의 걸음수 (기본 16보)
     playSyncWalk(2.5, 'power1.inOut', 8);
     gsap.to('.duck-container', {
       left: STAGE_CONFIG.sec1.windmill.walkToLeft || '10vw',
@@ -174,7 +207,6 @@ export default function Home() {
     if (isAnimatingRef.current) return;
     isAnimatingRef.current = true;
 
-    // ⭐️ 진동수 조절 2: 우편함으로 걸어갈 때의 걸음수 (기본 16보)
     playSyncWalk(2.5, 'power1.inOut', 8);
     gsap.to('.duck-container', {
       left: STAGE_CONFIG.sec2.mailbox.walkToLeft || '10vw',
@@ -209,13 +241,19 @@ export default function Home() {
       gsap.set('.sky-bg', { autoAlpha: 0 });
       gsap.set('.ground-bg', { y: '100%' });
       gsap.set('.sun-wrapper, .cloud-wrapper', { y: '-150vh', opacity: 1 });
-      gsap.set('.deco', { y: '150vh', opacity: 1 });
 
-      // ⭐️ 오리의 위치를 창 크기가 변해도 끄떡없는 left, bottom으로 세팅!
+      gsap.set('.deco', {
+        y: '150vh',
+        opacity: 1,
+        xPercent: -50,
+        transformOrigin: 'bottom center',
+      });
+
       gsap.set('.duck-container', {
         top: 'auto',
         left: STAGE_CONFIG.duck.positions.sec0.left,
         bottom: STAGE_CONFIG.duck.positions.sec0.bottom,
+        xPercent: -50,
         scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
         scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
         transformOrigin: 'bottom center',
@@ -302,7 +340,7 @@ export default function Home() {
               {
                 left: STAGE_CONFIG.duck.positions.sec0.left,
                 bottom: STAGE_CONFIG.duck.positions.sec0.bottom,
-                y: '150vh', // 위에서 떨어지는 효과를 위해 y 사용
+                y: '150vh',
                 scaleX: STAGE_CONFIG.duck.positions.sec0.scale,
                 scaleY: STAGE_CONFIG.duck.positions.sec0.scale,
               },
@@ -345,7 +383,6 @@ export default function Home() {
               enterTime
             );
 
-            // ⭐️ 진동수 조절 3: 화면 밖에서 걸어 들어올 때의 걸음수 (기본 16보)
             tl.add(() => playSyncWalk(2.5, 'power2.out', 10), enterTime);
             tl.to(
               '.duck-container',
@@ -365,7 +402,6 @@ export default function Home() {
             scaleX: targetScaleX,
             scaleY: duckPos.scale,
           })
-            // ⭐️ 진동수 조절 4: 스크롤로 무대 1 <-> 2 이동할 때의 걸음수 (기본 14보)
             .add(() => playSyncWalk(2, 'power2.inOut', 10), 'walk')
             .to(
               '.ground',
@@ -496,7 +532,6 @@ export default function Home() {
           alt=""
         />
 
-        {/* ⭐️ 풍차 원상복구: 상자 안에서 이미지가 꽉 차게(absolute, 100%) 들어가야 날개 위치가 안 깨집니다! */}
         <div
           className="deco puppet"
           style={{ ...STAGE_CONFIG.sec1.windmill, cursor: 'pointer' }}
@@ -546,7 +581,6 @@ export default function Home() {
           alt=""
         />
 
-        {/* ⭐️ 우편함 원상복구: objectFit: contain 복구! */}
         <img
           src={`${import.meta.env.BASE_URL}assets/Mailbox.png`}
           alt="Mailbox"
@@ -574,8 +608,10 @@ export default function Home() {
           className="panel contact-panel"
           style={{ pointerEvents: 'none' }}
         >
+          {/* ⭐️ 안정성 200%! ref 속성 추가 완료! */}
           {isMailboxOpen && (
             <div
+              ref={contactCardRef}
               className="contact-card"
               style={{
                 ...contactStyles.card,
