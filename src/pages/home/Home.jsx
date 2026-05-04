@@ -444,7 +444,7 @@ export default function Home() {
           const isTouch =
             self.event.type.includes('touch') ||
             self.event.type.includes('pointer');
-          const delta = isTouch ? self.deltaY : -self.deltaY; // 감독님의 완벽한 한 줄 세팅!
+          const delta = isTouch ? -self.deltaY : -self.deltaY; // 감독님의 완벽한 한 줄 세팅!
 
           if (delta > 0 && currentIndexRef.current < 2)
             goToSection(currentIndexRef.current + 1);
