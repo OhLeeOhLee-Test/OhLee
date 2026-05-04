@@ -15,7 +15,7 @@ export default function App() {
     // 준비하신 로딩 GIF 길이에 맞춰 이 숫자를 조절하세요!
     const timer = setTimeout(() => {
       setIsEntered(true);
-    }, 5000);
+    }, 1000);
 
     return () => clearTimeout(timer); // 클린업 (안전장치)
   }, []);

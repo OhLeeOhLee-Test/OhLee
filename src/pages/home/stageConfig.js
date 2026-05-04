@@ -14,7 +14,7 @@ export const getStageConfig = (device) => {
       positions: {
         sec0: {
           left: device === 'mobile' ? '95vw' : '85vw',
-          bottom: device === 'mobile' ? '-150px' : '-50vh', // -200px -> -150px
+          bottom: device === 'mobile' ? '-200px' : '-50vh', // -200px -> -150px
           scale: device === 'mobile' ? 3 : 1.5,
         },
         sec1: {
@@ -78,13 +78,20 @@ export const getStageConfig = (device) => {
         outDir: 'bottom',
       },
 
+      // stageConfig.js 의 1번 무대 풍차 부분
       windmill: {
         left: device === 'mobile' ? '80vw' : '75vw',
-        bottom: device === 'mobile' ? '200px' : '20vh', // 150px -> 200px
+        bottom: device === 'mobile' ? '200px' : '20vh',
         width: device === 'mobile' ? '60vw' : '40vw',
         zIndex: 10,
         outDir: 'bottom',
         walkToLeft: device === 'mobile' ? '60vw' : '60vw',
+
+        // ⭐️ 날개의 크기와 꽂히는 위치를 모바일/PC 따로따로 제어합니다!
+        // (아래 숫자를 직접 만져보시면서 모바일/PC 각각 완벽한 중심점을 찾아보세요!)
+        wingTop: device === 'mobile' ? '61%' : '61%', // 예시: PC는 살짝 아래로?
+        wingLeft: device === 'mobile' ? '60%' : '60%', // 예시: PC는 살짝 오른쪽으로?
+        wingWidth: device === 'mobile' ? '60%' : '60%', // 예시: PC 날개 크기 조절
       },
     },
 

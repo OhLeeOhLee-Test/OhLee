@@ -530,24 +530,34 @@ export default function Home() {
           alt=""
         />
 
+        {/* ⚙️ 풍차 렌더링 부분 */}
         <div
           className="deco puppet"
           style={{ ...STAGE_CONFIG.sec1.windmill, cursor: 'pointer' }}
           onClick={handleWindmillClick}
         >
+          {/* 몸통 */}
           <img
             src={`${import.meta.env.BASE_URL}assets/Windmill_body.png`}
             alt="Windmill Body"
+            style={{ width: '100%', display: 'block' }}
+          />
+
+          {/* ⭐️ CSS 대신 JS에서 기종별 좌표를 실시간으로 받아옵니다! */}
+          <div
+            className="windmill-wing-wrapper"
             style={{
-              width: '100%',
-              display: 'block', // ⭐️ 복잡한 스타일 다 빼고 이것만 남깁니다! (하단 미세 여백 제거용)
+              top: STAGE_CONFIG.sec1.windmill.wingTop,
+              left: STAGE_CONFIG.sec1.windmill.wingLeft,
+              width: STAGE_CONFIG.sec1.windmill.wingWidth,
             }}
-          />
-          <img
-            src={`${import.meta.env.BASE_URL}assets/Windmill_wing.png`}
-            alt="Windmill Wing"
-            className="windmill-wing"
-          />
+          >
+            <img
+              src={`${import.meta.env.BASE_URL}assets/Windmill_wing.png`}
+              alt="Windmill Wing"
+              className="windmill-wing-img"
+            />
+          </div>
         </div>
 
         <img

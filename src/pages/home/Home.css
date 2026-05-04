@@ -166,14 +166,31 @@ body {
   pointer-events: none;
 }
 
-/* ⚙️ 풍차 날개 빙글빙글 애니메이션 */
-.windmill-wing {
+/* ==========================================
+   ⚙️ 풍차 날개 완벽 고정
+========================================== */
+
+.windmill-wing-wrapper {
   position: absolute;
-  top: 40.5%;
-  left: 30.5%;
-  width: 75%;
+  /* top, left, width는 JS에서 꽂아주므로 삭제! */
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.windmill-wing-img {
+  width: 100%;
+  display: block;
   transform-origin: center center;
   animation: spinWing 8s linear infinite;
+}
+
+@keyframes spinWing {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes spinWing {
