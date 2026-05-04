@@ -62,6 +62,7 @@ export default function Home() {
   const lastInteractionRef = useRef(null);
 
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
+  const [isWindmillLoaded, setIsWindmillLoaded] = useState(false);
   const [shouldPlayIris] = useState(
     () => sessionStorage.getItem('playIris') === 'true'
   );
@@ -530,7 +531,7 @@ export default function Home() {
           alt=""
         />
 
-        {/* ⚙️ 풍차 렌더링 부분 */}
+        {/* ⚙️ 풍차 렌더링 */}
         <div
           className="deco puppet"
           style={{ ...STAGE_CONFIG.sec1.windmill, cursor: 'pointer' }}
@@ -541,23 +542,27 @@ export default function Home() {
             src={`${import.meta.env.BASE_URL}assets/Windmill_body.png`}
             alt="Windmill Body"
             style={{ width: '100%', display: 'block' }}
+            // ⭐️ 핵심: 몸통 이미지가 완전히 화면에 그려지면(높이가 생기면) true로 바꿉니다!
+            onLoad={() => setIsWindmillLoaded(true)}
           />
 
-          {/* ⭐️ CSS 대신 JS에서 기종별 좌표를 실시간으로 받아옵니다! */}
-          <div
-            className="windmill-wing-wrapper"
-            style={{
-              top: STAGE_CONFIG.sec1.windmill.wingTop,
-              left: STAGE_CONFIG.sec1.windmill.wingLeft,
-              width: STAGE_CONFIG.sec1.windmill.wingWidth,
-            }}
-          >
-            <img
-              src={`${import.meta.env.BASE_URL}assets/Windmill_wing.png`}
-              alt="Windmill Wing"
-              className="windmill-wing-img"
-            />
-          </div>
+          {/* ⭐️ 몸통 로딩이 완료(true)되었을 때만 날개를 렌더링합니다! */}
+          {isWindmillLoaded && (
+            <div
+              className="windmill-wing-wrapper"
+              style={{
+                top: STAGE_CONFIG.sec1.windmill.wingTop,
+                left: STAGE_CONFIG.sec1.windmill.wingLeft,
+                width: STAGE_CONFIG.sec1.windmill.wingWidth,
+              }}
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}assets/Windmill_wing.png`}
+                alt="Windmill Wing"
+                className="windmill-wing-img"
+              />
+            </div>
+          )}
         </div>
 
         <img

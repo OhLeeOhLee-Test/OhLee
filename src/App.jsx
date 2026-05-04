@@ -9,15 +9,27 @@ import './App.css';
 export default function App() {
   const [isEntered, setIsEntered] = useState(false);
 
-  // ⭐️ 접속하자마자 바로 실행되는 마법의 타이머!
   useEffect(() => {
-    // 3000(3초) 뒤에 isEntered를 true로 바꿔서 메인으로 넘깁니다.
-    // 준비하신 로딩 GIF 길이에 맞춰 이 숫자를 조절하세요!
+    // 1️⃣ 로딩 화면이 도는 3초 동안, 무거운 핵심 이미지들을 미리 다운로드합니다! (Preload)
+    const imagesToPreload = [
+      `${import.meta.env.BASE_URL}assets/Windmill_body.png`,
+      `${import.meta.env.BASE_URL}assets/Windmill_wing.png`,
+      `${import.meta.env.BASE_URL}assets/Mailbox.png`,
+      `${import.meta.env.BASE_URL}assets/Tree.png`,
+      // 필요하다면 오리나 다른 배경 이미지도 여기에 추가하세요!
+    ];
+
+    imagesToPreload.forEach((src) => {
+      const img = new Image();
+      img.src = src; // 브라우저가 뒤에서 몰래 이미지를 불러와서 기억해둡니다.
+    });
+
+    // 2️⃣ 3000(3초) 뒤에 메인으로 넘깁니다. (이미지 준비 완료!)
     const timer = setTimeout(() => {
       setIsEntered(true);
-    }, 1000);
+    }, 3000);
 
-    return () => clearTimeout(timer); // 클린업 (안전장치)
+    return () => clearTimeout(timer); // 클린업
   }, []);
 
   // 1️⃣ 입장 전: 버튼 없이 바로 뜨는 로딩 GIF 화면
