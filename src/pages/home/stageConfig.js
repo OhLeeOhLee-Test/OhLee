@@ -103,7 +103,7 @@ export const getStageConfig = (device) => {
         outDir: 'bottom',
       },
       grass2_sub: {
-        left: device === 'mobile' ? '120vw' : '110vw',
+        left: device === 'mobile' ? '120vw' : '160vw',
         bottom: device === 'mobile' ? '230px' : '30vh', // 180px -> 230px
         width: device === 'mobile' ? '25vw' : '18vw',
         outDir: 'bottom',
