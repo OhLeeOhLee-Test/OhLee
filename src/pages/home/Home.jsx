@@ -86,7 +86,7 @@ export default function Home() {
       isDay,
       sunStyle: isDay
         ? {
-            left: `${80 - progress * 70}vw`,
+            left: `${10 + progress * 70}vw`,
             top: `${baseY - Math.sin(progress * Math.PI) * amplitude}vh`,
           }
         : {},
@@ -444,7 +444,7 @@ export default function Home() {
           const isTouch =
             self.event.type.includes('touch') ||
             self.event.type.includes('pointer');
-          const delta = isTouch ? -self.deltaY : -self.deltaY; // 감독님의 완벽한 한 줄 세팅!
+          const delta = isTouch ? self.deltaY : -self.deltaY; // 감독님의 완벽한 한 줄 세팅!
 
           if (delta > 0 && currentIndexRef.current < 2)
             goToSection(currentIndexRef.current + 1);
@@ -540,11 +540,7 @@ export default function Home() {
             alt="Windmill Body"
             style={{
               width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
+              display: 'block', // ⭐️ 복잡한 스타일 다 빼고 이것만 남깁니다! (하단 미세 여백 제거용)
             }}
           />
           <img
@@ -585,8 +581,7 @@ export default function Home() {
           className="deco puppet"
           style={{
             ...STAGE_CONFIG.sec2.mailbox,
-            objectFit: 'contain',
-            cursor: 'pointer',
+            cursor: 'pointer', // ⭐️ objectFit: 'contain'을 과감하게 삭제했습니다!
           }}
           onClick={handleMailboxClick}
         />
